@@ -3,7 +3,7 @@ import { Prism as SyntaxHighlighter } from "react-syntax-highlighter";
 import { coldarkDark as theme } from "react-syntax-highlighter/dist/esm/styles/prism";
 import copy from "copy-to-clipboard";
 
-export type FrameworkTypes = "HTML" | "Tailwind" | "Flutter" | "SwiftUI";
+export type FrameworkTypes = "HTML" | "Tailwind" | "Flutter" | "SwiftUI" | "LVGL";
 
 // This must be kept in sync with the backend.
 export type PluginSettings = {
@@ -15,6 +15,7 @@ export type PluginSettings = {
   responsiveRoot: boolean;
   flutterGenerationMode: string;
   swiftUIGenerationMode: string;
+  lvglUIGenerationMode: string;
   roundTailwind: boolean;
 };
 
@@ -44,8 +45,8 @@ export const PluginUI = (props: PluginUIProps) => {
 
   return (
     <div className="flex flex-col h-full dark:text-white">
-      <div className="p-2 grid grid-cols-4 sm:grid-cols-2 md:grid-cols-4 gap-1">
-        {["HTML", "Tailwind", "Flutter", "SwiftUI"].map((tab) => (
+      <div className="p-2 grid grid-cols-5 sm:grid-cols-2 md:grid-cols-5 gap-1">
+        {["HTML", "Tailwind", "Flutter", "SwiftUI", "LVGL"].map((tab) => (
           <button
             key={`tab ${tab}`}
             className={`w-full p-1 text-sm ${
@@ -193,7 +194,7 @@ export const preferenceOptions: LocalCodegenPreference[] = [
     propertyName: "optimizeLayout",
     label: "Optimize Layout",
     isDefault: true,
-    includedLanguages: ["HTML", "Tailwind", "Flutter", "SwiftUI"],
+    includedLanguages: ["HTML", "Tailwind", "Flutter", "SwiftUI", "LVGL"],
   },
   {
     itemType: "individual_select",

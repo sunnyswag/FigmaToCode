@@ -7,8 +7,9 @@ import { flutterMain } from "./flutter/flutterMain";
 import { htmlMain } from "./html/htmlMain";
 import { swiftuiMain } from "./swiftui/swiftuiMain";
 import { tailwindMain } from "./tailwind/tailwindMain";
+import { lvgluiMain } from "./lvgl/lvgluiMain";
 
-export type FrameworkTypes = "Flutter" | "SwiftUI" | "HTML" | "Tailwind";
+export type FrameworkTypes = "Flutter" | "SwiftUI" | "HTML" | "Tailwind" | "LVGL";
 
 export type PluginSettings = {
   framework: FrameworkTypes;
@@ -19,6 +20,7 @@ export type PluginSettings = {
   responsiveRoot: boolean;
   flutterGenerationMode: string;
   swiftUIGenerationMode: string;
+  lvglUIGenerationMode: string;
   roundTailwind: boolean;
 };
 
@@ -49,6 +51,8 @@ export const run = (settings: PluginSettings) => {
     case "SwiftUI":
       result = swiftuiMain(convertedSelection, settings);
       break;
+    case "LVGL":
+      result = lvgluiMain(convertedSelection, settings)
   }
 
   figma.ui.postMessage({
