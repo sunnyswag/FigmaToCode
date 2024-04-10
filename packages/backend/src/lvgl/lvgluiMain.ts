@@ -8,27 +8,13 @@ import { commonSortChildrenWhenInferredAutoLayout } from "../common/commonChildr
 let localSettings: PluginSettings;
 let previousExecutionCache: string[];
 
-const getStructTemplate = (name: string, injectCode: string): string =>
-  `struct ${name}: View {
-  var body: some View {
-    ${indentString(injectCode, 4).trimStart()};
-  }
-}`;
 
 const getPreviewTemplate = (name: string, injectCode: string): string =>
-  `import lvglUI
+  `#include "lvgl/lvgl.h"
 
-struct ContentView: View {
-  var body: some View {
-    ${indentString(injectCode, 4).trimStart()};
-  }
-}
-
-struct ContentView_Previews: PreviewProvider {
-  static var previews: some View {
-    ContentView()
-  }
-}`;
+  void preview_generated_lvgl_code(void) {
+      ${indentString(injectCode, 4).trimStart()};
+  }`;
 
 export const lvgluiMain = (
   sceneNode: Array<SceneNode>,
@@ -41,9 +27,6 @@ export const lvgluiMain = (
   switch (localSettings.lvglUIGenerationMode) {
     case "snippet":
       return result;
-    case "struct":
-      // result = generateWidgetCode("Column", { children: [result] });
-      return getStructTemplate(className(sceneNode[0].name), result);
     case "preview":
       // result = generateWidgetCode("Column", { children: [result] });
       return getPreviewTemplate(className(sceneNode[0].name), result);

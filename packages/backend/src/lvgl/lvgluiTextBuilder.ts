@@ -12,18 +12,18 @@ import { parseTextAsCode } from "../flutter/flutterTextBuilder";
 import { lvgluiSolidColor } from "./builderImpl/lvgluiColor";
 
 export class lvgluiTextBuilder extends lvgluiDefaultBuilder {
-  modifiers: string[] = [];
+  styles: string[] = [];
 
   constructor(kind: string = "Text") {
     super(kind);
   }
 
   reset(): void {
-    this.modifiers = [];
+    this.styles = [];
   }
 
   textAutoSize(node: TextNode): this {
-    this.modifiers.push(this.wrapTextAutoResize(node));
+    this.styles.push(this.wrapTextAutoResize(node));
     return this;
   }
 
@@ -70,9 +70,9 @@ export class lvgluiTextBuilder extends lvgluiDefaultBuilder {
     if (node.textAutoResize !== "WIDTH_AND_HEIGHT") {
       // it can be confusing, but multilineTextAlignment is always set to left by default.
       if (node.textAlignHorizontal === "CENTER") {
-        this.modifiers.push(".multilineTextAlignment(.center)");
+        this.styles.push(".multilineTextAlignment(.center)");
       } else if (node.textAlignHorizontal === "RIGHT") {
-        this.modifiers.push(".multilineTextAlignment(.trailing)");
+        this.styles.push(".multilineTextAlignment(.trailing)");
       }
     }
 
@@ -128,17 +128,17 @@ export class lvgluiTextBuilder extends lvgluiDefaultBuilder {
     const element = new lvglUIElement(
       `Text(${parseTextAsCode(`"${characters}"`)})`
     )
-      .addModifier([
+      .addStyle([
         "font",
         `Font.custom("${fontFamily}", size: ${fontSize})${
           fontWeight ? `${fontWeight}` : ""
         }`,
       ])
-      .addModifier(["tracking", letterSpacing])
-      .addModifier(["lineSpacing", lineHeight])
-      .addModifier([this.textDecoration(segment.textDecoration), ""])
-      .addModifier([this.textStyle(segment.fontName.style), ""])
-      .addModifier(["foregroundColor", this.textColor(segment.fills)]);
+      .addStyle(["tracking", letterSpacing])
+      .addStyle(["lineSpacing", lineHeight])
+      .addStyle([this.textDecoration(segment.textDecoration), ""])
+      .addStyle([this.textStyle(segment.fontName.style), ""])
+      .addStyle(["foregroundColor", this.textColor(segment.fills)]);
 
     return element;
     // });

@@ -18,7 +18,7 @@ import {
   commonIsAbsolutePosition,
   getCommonPositionValue,
 } from "../common/commonPosition";
-import { Modifier, lvglUIElement } from "./builderImpl/lvgluiParser";
+import { Style, lvglUIElement } from "./builderImpl/lvgluiParser";
 
 export class lvgluiDefaultBuilder {
   element: lvglUIElement;
@@ -27,10 +27,10 @@ export class lvgluiDefaultBuilder {
     this.element = new lvglUIElement(kind);
   }
 
-  pushModifier(...args: (Modifier | null)[]): void {
-    args.forEach((modifier) => {
-      if (modifier) {
-        this.element.addModifier(modifier);
+  pushStyle(...args: (Style | null)[]): void {
+    args.forEach((style) => {
+      if (style) {
+        this.element.addStyle(style);
       }
     });
   }
@@ -44,7 +44,7 @@ export class lvgluiDefaultBuilder {
   }
 
   blend(node: SceneNode & LayoutMixin & MinimalBlendMixin): this {
-    this.pushModifier(
+    this.pushStyle(
       lvgluiVisibility(node),
       lvgluiRotation(node),
       lvgluiOpacity(node),
@@ -84,7 +84,7 @@ export class lvgluiDefaultBuilder {
         node.parent
       );
 
-      this.pushModifier([
+      this.pushStyle([
         `offset`,
         `x: ${sliceNum(centerX)}, y: ${sliceNum(centerY)}`,
       ]);
@@ -96,7 +96,7 @@ export class lvgluiDefaultBuilder {
     const borders = lvgluiBorder(node);
     if (borders) {
       borders.forEach((border) => {
-        this.element.addModifierMixed("overlay", border);
+        this.element.addStyleMixed("overlay", border);
       });
     }
     return this;
@@ -106,7 +106,7 @@ export class lvgluiDefaultBuilder {
     if ("fills" in node) {
       const background = lvgluiBackground(node, node.fills);
       if (background) {
-        this.pushModifier([`background`, background]);
+        this.pushStyle([`background`, background]);
       }
     }
     return this;
@@ -114,7 +114,7 @@ export class lvgluiDefaultBuilder {
 
   shapeForeground(node: SceneNode): this {
     if (!("children" in node) || node.children.length === 0) {
-      this.pushModifier([`foregroundColor`, ".clear"]);
+      this.pushStyle([`foregroundColor`, ".clear"]);
     }
     return this;
   }
@@ -122,7 +122,7 @@ export class lvgluiDefaultBuilder {
   cornerRadius(node: SceneNode): this {
     const corner = lvgluiCornerRadius(node);
     if (corner) {
-      this.pushModifier([`cornerRadius`, corner]);
+      this.pushStyle([`cornerRadius`, corner]);
     }
     return this;
   }
@@ -132,7 +132,7 @@ export class lvgluiDefaultBuilder {
       return this;
     }
 
-    this.pushModifier(lvgluiBlur(node), lvgluiShadow(node));
+    this.pushStyle(lvgluiBlur(node), lvgluiShadow(node));
 
     return this;
   }
@@ -141,7 +141,7 @@ export class lvgluiDefaultBuilder {
     const { width, height } = lvgluiSize(node, optimize);
     const sizes = [width, height].filter((d) => d);
     if (sizes.length > 0) {
-      this.pushModifier([`frame`, sizes.join(", ")]);
+      this.pushStyle([`frame`, sizes.join(", ")]);
     }
 
     return this;
@@ -149,7 +149,7 @@ export class lvgluiDefaultBuilder {
 
   autoLayoutPadding(node: SceneNode, optimizeLayout: boolean): this {
     if ("paddingLeft" in node) {
-      this.pushModifier(
+      this.pushStyle(
         lvgluiPadding(
           (optimizeLayout ? node.inferredAutoLayout : null) ?? node
         )

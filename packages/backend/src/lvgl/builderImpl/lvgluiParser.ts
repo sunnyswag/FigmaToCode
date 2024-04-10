@@ -1,44 +1,44 @@
 import { indentString } from "../../common/indentString";
 
-export type Modifier = [string, string | Modifier | Modifier[]];
+export type Style = [string, string | Style | Style[]];
 
 export class lvglUIElement {
   private readonly element: string;
-  private readonly modifiers: Modifier[];
+  private readonly styles: Style[];
 
-  constructor(element: string = "", modifiers: Modifier[] = []) {
+  constructor(element: string = "", styles: Style[] = []) {
     this.element = element;
-    this.modifiers = modifiers;
+    this.styles = styles;
   }
 
-  addModifierMixed(
+  addStyleMixed(
     property: string,
-    value: string | Modifier | Modifier[]
+    value: string | Style | Style[]
   ): this {
-    this.modifiers.push([property, value]);
+    this.styles.push([property, value]);
     return this;
   }
 
-  addModifier(modifier: Modifier | [string | null, string | null]): this {
-    if (modifier && modifier[0] !== null && modifier[1] !== null) {
-      this.modifiers.push([modifier[0], modifier[1]]);
+  addStyle(style: Style | [string | null, string | null]): this {
+    if (style && style[0] !== null && style[1] !== null) {
+      this.styles.push([style[0], style[1]]);
     }
     return this;
   }
 
-  addChildElement(element: string, ...modifiers: Modifier[]): lvglUIElement {
-    const childModifiers = modifiers.length === 1 ? modifiers[0] : modifiers;
-    return this.addModifierMixed(element, childModifiers as Modifier);
+  addChildElement(element: string, ...styles: Style[]): lvglUIElement {
+    const childStyles = styles.length === 1 ? styles[0] : styles;
+    return this.addStyleMixed(element, childStyles as Style);
   }
 
-  private buildModifierLines(indentLevel: number): string {
+  private buildStyleLines(indentLevel: number): string {
     const indent = " ".repeat(indentLevel);
-    return this.modifiers
+    return this.styles
       .map(([property, value]) =>
         Array.isArray(value)
           ? `${indent}.${property}(${new lvglUIElement(
               property,
-              value as Modifier[]
+              value as Style[]
             )
               .toString()
               .trim()})`
@@ -53,11 +53,11 @@ export class lvglUIElement {
   }
 
   toString(indentLevel = 0): string {
-    if (this.modifiers.length === 0) {
+    if (this.styles.length === 0) {
       return this.element;
     }
 
-    const modifierLines = this.buildModifierLines(indentLevel + 2);
-    return indentString(`${this.element}\n${modifierLines}`, 0);
+    const styleLines = this.buildStyleLines(indentLevel + 2);
+    return indentString(`${this.element}\n${styleLines}`, 0);
   }
 }
