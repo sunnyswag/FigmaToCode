@@ -6,45 +6,25 @@ import { Modifier } from "./lvgluiStyle";
  */
 export const lvgluiOpacity = (node: MinimalBlendMixin): Modifier | null => {
   if (node.opacity !== undefined && node.opacity !== 1) {
-    return ["opacity", sliceNum(node.opacity)];
+    let opacity = Math.max(0, Math.min(255, Math.round(node.opacity * 255)));
+    return ["lv_obj_set_style_opa", opacity];
   }
   return null;
 };
 
-/**
- * https://developer.apple.com/documentation/lvglui/view/hidden()
- */
 export const lvgluiVisibility = (node: SceneNodeMixin): Modifier | null => {
   // [when testing] node.visible can be undefined
   if (node.visible !== undefined && !node.visible) {
-    return ["hidden", ""];
+    return ["lv_obj_add_flag", "LV_OBJ_FLAG_HIDDEN"];
   }
   return null;
 };
 
-/**
- * https://developer.apple.com/documentation/lvglui/modifiedcontent/rotationeffect(_:anchor:)
- */
 export const lvgluiRotation = (node: LayoutMixin): Modifier | null => {
-  if (node.rotation !== undefined && Math.round(node.rotation) !== 0) {
-    return ["rotationEffect", `.degrees(${sliceNum(node.rotation)})`];
-  }
   return null;
 };
 
-/**
- * https://developer.apple.com/documentation/lvglui/blendmode
- */
-export const lvgluiBlendMode = (node: MinimalBlendMixin): Modifier | null => {
-  const fromBlendEnum = blendModeEnum(node);
-  if (fromBlendEnum) {
-    return ["blendMode", fromBlendEnum];
-  }
-
-  return null;
-};
-
-const blendModeEnum = (node: MinimalBlendMixin): string => {
+export const blendModeEnum = (node: MinimalBlendMixin): string => {
   switch (node.blendMode) {
     case "COLOR":
       return ".color";

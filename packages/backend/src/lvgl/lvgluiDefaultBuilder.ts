@@ -6,7 +6,6 @@ import {
   lvgluiVisibility,
   lvgluiOpacity,
   lvgluiRotation,
-  lvgluiBlendMode,
 } from "./builderImpl/lvgluiBlend";
 import {
   commonIsAbsolutePosition,
@@ -16,27 +15,30 @@ import { Modifier, pushModifier } from "./builderImpl/lvgluiStyle";
 import { LvglUIStyle } from "./builderImpl/lvgluiStyle";
 
 export class LvgluiDefaultBuilder {
+  private currentNodeName: string;
+  private parentNodeName: string;
   private styleIndex: number;
   private modifiers: Modifier[] = []
 
-  constructor(styleIndex: number) {
+  constructor(currentNodeName: string, parentNodeName: string, styleIndex: number) {
+    this.parentNodeName = parentNodeName;
+    this.currentNodeName = currentNodeName;
     this.styleIndex = styleIndex;
   }
 
   commonPositionModifiers(node: SceneNode, optimizeLayout: boolean): this {
     this.position(node, optimizeLayout);
     if ("layoutAlign" in node && "opacity" in node) {
-      this.blend(node);
+      this.opacity(node);
     }
     return this;
   }
 
-  blend(node: SceneNode & LayoutMixin & MinimalBlendMixin): this {
+  opacity(node: SceneNode & LayoutMixin & MinimalBlendMixin): this {
     this.pushModifier(
       lvgluiVisibility(node),
       lvgluiRotation(node),
-      lvgluiOpacity(node),
-      lvgluiBlendMode(node)
+      lvgluiOpacity(node)
     );
 
     return this;
@@ -65,16 +67,10 @@ export class LvgluiDefaultBuilder {
   position(node: SceneNode, optimizeLayout: boolean): this {
     if (commonIsAbsolutePosition(node, optimizeLayout)) {
       const { x, y } = getCommonPositionValue(node);
-      const { centerX, centerY } = this.topLeftToCenterOffset(
-        x,
-        y,
-        node,
-        node.parent
-      );
 
       this.pushModifier([
-        `offset`,
-        `x: ${sliceNum(centerX)}, y: ${sliceNum(centerY)}`,
+        `lv_obj_align`,
+        `${this.parentNodeName}, ${Math.round(x)}, ${Math.round(y)}`,
       ]);
     }
     return this;

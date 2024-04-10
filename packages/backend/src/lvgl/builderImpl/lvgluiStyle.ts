@@ -1,18 +1,21 @@
 import { calculateContrastRatio } from "../../common/retrieveUI/commonUI";
 import { lvgluiBlur, lvgluiShadow } from "./lvgluiEffects";
+import { blendModeEnum } from "./lvgluiBlend";
 import {
   lvgluiBorder,
   lvgluiCornerRadius,
 } from "./lvgluiBorder";
 import { lvgluiBackground } from "./lvgluiColor";
 
-export type Modifier = [string, string | Modifier | Modifier[]];
+export type Modifier = [string, string | Modifier | Modifier[] | number];
 
 
 export class LvglUIStyle {
     static styleCache: Modifier[] = []
 
-    static buildModifierAndGetIndex(node: SceneNode): number {
+    static buildModifierAndGetIndex(node: SceneNode & LayoutMixin & MinimalBlendMixin): number {
+        new LvglUIStyle()
+            .lvgluiBlendMode(node)
         return 0
     }
 
@@ -29,12 +32,22 @@ export class LvglUIStyle {
         }
         return this;
       }
+
+    private lvgluiBlendMode(node: MinimalBlendMixin): this {
+        // TODO: edit blend logic
+        const fromBlendEnum = blendModeEnum(node);
+        if (fromBlendEnum) {
+            return this.pushModifier(["blend_mode", fromBlendEnum]);
+        }
+        
+        return this;
+    }
     
     private shapeBackground(node: SceneNode): this {
         if ("fills" in node) {
             const background = lvgluiBackground(node, node.fills);
             if (background) {
-            this.pushModifier([`background`, background]);
+                this.pushModifier([`background`, background]);
             }
         }
         return this;
