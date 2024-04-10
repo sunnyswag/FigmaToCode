@@ -1,10 +1,10 @@
 import { sliceNum } from "../../common/numToAutoFixed";
-import { Style } from "./lvgluiParser";
+import { Modifier } from "./lvgluiStyle";
 
 /**
  * https://developer.apple.com/documentation/lvglui/view/opacity(_:)
  */
-export const lvgluiOpacity = (node: MinimalBlendMixin): Style | null => {
+export const lvgluiOpacity = (node: MinimalBlendMixin): Modifier | null => {
   if (node.opacity !== undefined && node.opacity !== 1) {
     return ["opacity", sliceNum(node.opacity)];
   }
@@ -14,7 +14,7 @@ export const lvgluiOpacity = (node: MinimalBlendMixin): Style | null => {
 /**
  * https://developer.apple.com/documentation/lvglui/view/hidden()
  */
-export const lvgluiVisibility = (node: SceneNodeMixin): Style | null => {
+export const lvgluiVisibility = (node: SceneNodeMixin): Modifier | null => {
   // [when testing] node.visible can be undefined
   if (node.visible !== undefined && !node.visible) {
     return ["hidden", ""];
@@ -25,7 +25,7 @@ export const lvgluiVisibility = (node: SceneNodeMixin): Style | null => {
 /**
  * https://developer.apple.com/documentation/lvglui/modifiedcontent/rotationeffect(_:anchor:)
  */
-export const lvgluiRotation = (node: LayoutMixin): Style | null => {
+export const lvgluiRotation = (node: LayoutMixin): Modifier | null => {
   if (node.rotation !== undefined && Math.round(node.rotation) !== 0) {
     return ["rotationEffect", `.degrees(${sliceNum(node.rotation)})`];
   }
@@ -35,7 +35,7 @@ export const lvgluiRotation = (node: LayoutMixin): Style | null => {
 /**
  * https://developer.apple.com/documentation/lvglui/blendmode
  */
-export const lvgluiBlendMode = (node: MinimalBlendMixin): Style | null => {
+export const lvgluiBlendMode = (node: MinimalBlendMixin): Modifier | null => {
   const fromBlendEnum = blendModeEnum(node);
   if (fromBlendEnum) {
     return ["blendMode", fromBlendEnum];

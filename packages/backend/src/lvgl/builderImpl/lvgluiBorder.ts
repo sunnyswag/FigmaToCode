@@ -2,7 +2,7 @@ import { commonStroke } from "../../common/commonStroke";
 import { getCommonRadius } from "../../common/commonRadius";
 import { sliceNum } from "../../common/numToAutoFixed";
 import { lvglUISolidColor } from "./lvgluiColor";
-import { Style, lvglUIElement } from "./lvgluiParser";
+import { Modifier, LvglUIStyle } from "./lvgluiStyle";
 
 const lvglUIStroke = (node: SceneNode): number => {
   if (!("strokes" in node) || !node.strokes || node.strokes.length === 0) {
@@ -47,15 +47,15 @@ export const lvgluiBorder = (node: SceneNode): string[] | null => {
     .map((stroke) => {
       const strokeColor = lvglUISolidColor(stroke);
 
-      const strokeStyle: Style = [
+      const strokeModifier: Modifier = [
         "stroke",
         `${strokeColor}, lineWidth: ${sliceNum(width)}`,
       ];
 
       if (strokeColor) {
-        return new lvglUIElement(getViewType(node))
-          .addStyle(inset)
-          .addStyle(strokeStyle)
+        return new LvglUIStyle(getViewType(node))
+          .pushModifier(inset)
+          .pushModifier(strokeModifier)
           .toString();
       }
 

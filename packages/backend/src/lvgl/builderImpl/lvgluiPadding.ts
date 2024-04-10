@@ -1,6 +1,6 @@
 import { sliceNum } from "../../common/numToAutoFixed";
 import { commonPadding } from "../../common/commonPadding";
-import { Modifier } from "./lvgluiParser";
+import { Modifier } from "./lvgluiStyle";
 
 export const lvgluiPadding = (
   node: InferredAutoLayoutResult

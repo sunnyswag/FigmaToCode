@@ -1,13 +1,12 @@
 import { indentString } from "../common/indentString";
 import { className, sliceNum } from "../common/numToAutoFixed";
-import { lvgluiTextBuilder } from "./lvgluiTextBuilder";
-import { lvgluiDefaultBuilder } from "./lvgluiDefaultBuilder";
+import { LvgluiTextBuilder } from "./lvgluiTextBuilder";
+import { LvgluiDefaultBuilder } from "./lvgluiDefaultBuilder";
 import { PluginSettings } from "../code";
 import { commonSortChildrenWhenInferredAutoLayout } from "../common/commonChildrenOrder";
+import { LvglUIStyle } from "./builderImpl/lvgluiStyle";
 
 let localSettings: PluginSettings;
-let previousExecutionCache: string[];
-
 
 const getPreviewTemplate = (name: string, injectCode: string): string =>
   `#include "lvgl/lvgl.h"
@@ -21,7 +20,7 @@ export const lvgluiMain = (
   settings: PluginSettings
 ): string => {
   localSettings = settings;
-  previousExecutionCache = [];
+  LvglUIStyle.clearCachedUIModifier();
   let result = lvgluiWidgetGenerator(sceneNode, 0);
 
   switch (localSettings.lvglUIGenerationMode) {
@@ -98,14 +97,14 @@ export const lvgluiContainer = (
     kind = stack;
   }
 
-  const result = new lvgluiDefaultBuilder(kind)
+  const result = new LvgluiDefaultBuilder(kind)
     .shapeForeground(node)
     .autoLayoutPadding(node, localSettings.optimizeLayout)
     .size(node, localSettings.optimizeLayout)
     .shapeBackground(node)
     .cornerRadius(node)
     .shapeBorder(node)
-    .commonPositionStyles(node, localSettings.optimizeLayout)
+    .commonPositionModifiers(node, localSettings.optimizeLayout)
     .effects(node)
     .build(kind === stack ? -2 : 0);
 
@@ -124,11 +123,10 @@ const lvgluiGroup = (
 };
 
 const lvgluiText = (node: TextNode): string => {
-  const result = new lvgluiTextBuilder().createText(node);
-  previousExecutionCache.push(result.build());
+  const result = new LvgluiTextBuilder().createText(node);
 
   return result
-    .commonPositionStyles(node, localSettings.optimizeLayout)
+    .commonPositionModifiers(node, localSettings.optimizeLayout)
     .build();
 };
 
@@ -255,14 +253,4 @@ const widgetGeneratorWithLimits = (
   }
 
   return strBuilder;
-};
-
-export const lvglUICodeGenTextStyles = () => {
-  const result = previousExecutionCache
-    .map((style) => `${style}`)
-    .join("\n// ---\n");
-  if (!result) {
-    return "// No text styles in this selection";
-  }
-  return result;
 };

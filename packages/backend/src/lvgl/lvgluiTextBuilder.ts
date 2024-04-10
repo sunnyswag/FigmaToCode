@@ -3,27 +3,27 @@ import {
   commonLetterSpacing,
   commonLineHeight,
 } from "../common/commonTextHeightSpacing";
-import { lvgluiDefaultBuilder } from "./lvgluiDefaultBuilder";
+import { LvgluiDefaultBuilder } from "./lvgluiDefaultBuilder";
 import { lvgluiWeightMatcher } from "./builderImpl/lvgluiTextWeight";
 import { lvgluiSize } from "./builderImpl/lvgluiSize";
-import { globalTextStyleSegments } from "../altNodes/altConversion";
-import { lvglUIElement } from "./builderImpl/lvgluiParser";
+import { globalTextModifierSegments } from "../altNodes/altConversion";
+import { LvglUIStyle } from "./builderImpl/lvgluiStyle";
 import { parseTextAsCode } from "../flutter/flutterTextBuilder";
 import { lvgluiSolidColor } from "./builderImpl/lvgluiColor";
 
-export class lvgluiTextBuilder extends lvgluiDefaultBuilder {
-  styles: string[] = [];
+export class LvgluiTextBuilder extends LvgluiDefaultBuilder {
+  modifiers: string[] = [];
 
   constructor(kind: string = "Text") {
     super(kind);
   }
 
   reset(): void {
-    this.styles = [];
+    this.modifiers = [];
   }
 
   textAutoSize(node: TextNode): this {
-    this.styles.push(this.wrapTextAutoResize(node));
+    this.modifiers.push(this.wrapTextAutoResize(node));
     return this;
   }
 
@@ -48,9 +48,9 @@ export class lvgluiTextBuilder extends lvgluiDefaultBuilder {
     return "";
   }
 
-  textStyle(style: string): string | null {
+  textModifier(modifier: string): string | null {
     // https://developer.apple.com/documentation/lvglui/text/italic()
-    if (style.toLowerCase().match("italic")) {
+    if (modifier.toLowerCase().match("italic")) {
       return "italic";
     }
     return null;
@@ -65,14 +65,14 @@ export class lvgluiTextBuilder extends lvgluiDefaultBuilder {
     return "";
   }
 
-  textStyle2 = (node: TextNode): this => {
+  textModifier2 = (node: TextNode): this => {
     // todo might be a good idea to calculate the width based on the font size and check if view is really multi-line
     if (node.textAutoResize !== "WIDTH_AND_HEIGHT") {
       // it can be confusing, but multilineTextAlignment is always set to left by default.
       if (node.textAlignHorizontal === "CENTER") {
-        this.styles.push(".multilineTextAlignment(.center)");
+        this.modifiers.push(".multilineTextAlignment(.center)");
       } else if (node.textAlignHorizontal === "RIGHT") {
-        this.styles.push(".multilineTextAlignment(.trailing)");
+        this.modifiers.push(".multilineTextAlignment(.trailing)");
       }
     }
 
@@ -85,7 +85,7 @@ export class lvgluiTextBuilder extends lvgluiDefaultBuilder {
     alignHorizontal =
       alignHorizontal === "justified" ? "justify" : alignHorizontal;
 
-    // const basicTextStyle = {
+    // const basicTextModifier = {
     //   textAlign:
     //     alignHorizontal !== "left" ? `TextAlign.${alignHorizontal}` : "",
     // };
@@ -94,14 +94,14 @@ export class lvgluiTextBuilder extends lvgluiDefaultBuilder {
     if (segments) {
       this.element = segments;
     } else {
-      this.element = new lvglUIElement("Text()");
+      this.element = new LvglUIStyle("Text()");
     }
 
     return this;
   }
 
-  getTextSegments(id: string, characters: string): lvglUIElement | null {
-    const segments = globalTextStyleSegments[id];
+  getTextSegments(id: string, characters: string): LvglUIStyle | null {
+    const segments = globalTextModifierSegments[id];
     if (!segments) {
       return null;
     }
@@ -125,20 +125,20 @@ export class lvgluiTextBuilder extends lvgluiDefaultBuilder {
       updatedText = characters.toUpperCase();
     }
 
-    const element = new lvglUIElement(
+    const element = new LvglUIStyle(
       `Text(${parseTextAsCode(`"${characters}"`)})`
     )
-      .addStyle([
+      .addModifier([
         "font",
         `Font.custom("${fontFamily}", size: ${fontSize})${
           fontWeight ? `${fontWeight}` : ""
         }`,
       ])
-      .addStyle(["tracking", letterSpacing])
-      .addStyle(["lineSpacing", lineHeight])
-      .addStyle([this.textDecoration(segment.textDecoration), ""])
-      .addStyle([this.textStyle(segment.fontName.style), ""])
-      .addStyle(["foregroundColor", this.textColor(segment.fills)]);
+      .addModifier(["tracking", letterSpacing])
+      .addModifier(["lineSpacing", lineHeight])
+      .addModifier([this.textDecoration(segment.textDecoration), ""])
+      .addModifier([this.textModifier(segment.fontName.modifier), ""])
+      .addModifier(["foregroundColor", this.textColor(segment.fills)]);
 
     return element;
     // });

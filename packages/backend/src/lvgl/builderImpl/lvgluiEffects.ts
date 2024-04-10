@@ -1,5 +1,5 @@
 import { sliceNum } from "../../common/numToAutoFixed";
-import { Modifier } from "./lvgluiParser";
+import { Modifier } from "./lvgluiStyle";
 
 export const lvgluiShadow = (node: SceneNode): Modifier | null => {
   if (!("effects" in node) || node.effects.length === 0) {

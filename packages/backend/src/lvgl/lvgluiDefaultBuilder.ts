@@ -1,10 +1,4 @@
 import { sliceNum } from "./../common/numToAutoFixed";
-import { lvgluiBlur, lvgluiShadow } from "./builderImpl/lvgluiEffects";
-import {
-  lvgluiBorder,
-  lvgluiCornerRadius,
-} from "./builderImpl/lvgluiBorder";
-import { lvgluiBackground } from "./builderImpl/lvgluiColor";
 import { lvgluiPadding } from "./builderImpl/lvgluiPadding";
 import { lvgluiSize } from "./builderImpl/lvgluiSize";
 
@@ -18,24 +12,18 @@ import {
   commonIsAbsolutePosition,
   getCommonPositionValue,
 } from "../common/commonPosition";
-import { Style, lvglUIElement } from "./builderImpl/lvgluiParser";
+import { Modifier, pushModifier } from "./builderImpl/lvgluiStyle";
+import { LvglUIStyle } from "./builderImpl/lvgluiStyle";
 
-export class lvgluiDefaultBuilder {
-  element: lvglUIElement;
+export class LvgluiDefaultBuilder {
+  private styleIndex: number;
+  private modifiers: Modifier[] = []
 
-  constructor(kind: string = "") {
-    this.element = new lvglUIElement(kind);
+  constructor(styleIndex: number) {
+    this.styleIndex = styleIndex;
   }
 
-  pushStyle(...args: (Style | null)[]): void {
-    args.forEach((style) => {
-      if (style) {
-        this.element.addStyle(style);
-      }
-    });
-  }
-
-  commonPositionStyles(node: SceneNode, optimizeLayout: boolean): this {
+  commonPositionModifiers(node: SceneNode, optimizeLayout: boolean): this {
     this.position(node, optimizeLayout);
     if ("layoutAlign" in node && "opacity" in node) {
       this.blend(node);
@@ -44,7 +32,7 @@ export class lvgluiDefaultBuilder {
   }
 
   blend(node: SceneNode & LayoutMixin & MinimalBlendMixin): this {
-    this.pushStyle(
+    this.pushModifier(
       lvgluiVisibility(node),
       lvgluiRotation(node),
       lvgluiOpacity(node),
@@ -84,7 +72,7 @@ export class lvgluiDefaultBuilder {
         node.parent
       );
 
-      this.pushStyle([
+      this.pushModifier([
         `offset`,
         `x: ${sliceNum(centerX)}, y: ${sliceNum(centerY)}`,
       ]);
@@ -92,56 +80,11 @@ export class lvgluiDefaultBuilder {
     return this;
   }
 
-  shapeBorder(node: SceneNode): this {
-    const borders = lvgluiBorder(node);
-    if (borders) {
-      borders.forEach((border) => {
-        this.element.addStyleMixed("overlay", border);
-      });
-    }
-    return this;
-  }
-
-  shapeBackground(node: SceneNode): this {
-    if ("fills" in node) {
-      const background = lvgluiBackground(node, node.fills);
-      if (background) {
-        this.pushStyle([`background`, background]);
-      }
-    }
-    return this;
-  }
-
-  shapeForeground(node: SceneNode): this {
-    if (!("children" in node) || node.children.length === 0) {
-      this.pushStyle([`foregroundColor`, ".clear"]);
-    }
-    return this;
-  }
-
-  cornerRadius(node: SceneNode): this {
-    const corner = lvgluiCornerRadius(node);
-    if (corner) {
-      this.pushStyle([`cornerRadius`, corner]);
-    }
-    return this;
-  }
-
-  effects(node: SceneNode): this {
-    if (node.type === "GROUP") {
-      return this;
-    }
-
-    this.pushStyle(lvgluiBlur(node), lvgluiShadow(node));
-
-    return this;
-  }
-
   size(node: SceneNode, optimize: boolean): this {
     const { width, height } = lvgluiSize(node, optimize);
     const sizes = [width, height].filter((d) => d);
     if (sizes.length > 0) {
-      this.pushStyle([`frame`, sizes.join(", ")]);
+      this.pushModifier([`frame`, sizes.join(", ")]);
     }
 
     return this;
@@ -149,7 +92,7 @@ export class lvgluiDefaultBuilder {
 
   autoLayoutPadding(node: SceneNode, optimizeLayout: boolean): this {
     if ("paddingLeft" in node) {
-      this.pushStyle(
+      this.pushModifier(
         lvgluiPadding(
           (optimizeLayout ? node.inferredAutoLayout : null) ?? node
         )
@@ -161,5 +104,10 @@ export class lvgluiDefaultBuilder {
   build(indentLevel: number = 0): string {
     // this.element.element = kind;
     return this.element.toString(indentLevel);
+  }
+
+  private pushModifier(...args: (Modifier | [string | null, string | null] | null)[]): this {
+     pushModifier(this.modifiers, ...args);
+     return this;
   }
 }
