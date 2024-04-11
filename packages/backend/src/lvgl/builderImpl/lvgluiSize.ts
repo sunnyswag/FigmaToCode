@@ -5,6 +5,7 @@ export const lvgluiSize = (
   node: SceneNode,
   optimizeLayout: boolean
 ): { width: string; height: string } => {
+  // TODO: process flex layout
   const size = nodeSize(node, optimizeLayout);
 
   // if width is set as maxWidth, height must also be set as maxHeight (not height)

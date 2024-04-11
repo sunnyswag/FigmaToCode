@@ -1,10 +1,9 @@
-import { sliceNum } from "../../common/numToAutoFixed";
 import { commonPadding } from "../../common/commonPadding";
 import { Modifier } from "./lvgluiStyle";
 
 export const lvgluiPadding = (
   node: InferredAutoLayoutResult
-): Modifier | null => {
+): Modifier[] | null => {
   if (!("layoutMode" in node)) {
     return null;
   }
@@ -14,28 +13,28 @@ export const lvgluiPadding = (
     return null;
   }
 
+  const result: Modifier[] = [];
   if ("all" in padding) {
-    if (padding.all === 0) {
-      return null;
-    }
-    return ["padding", sliceNum(padding.all)];
+    pushPadding(result, padding.all, "all")
+    return result;
   }
-
+  
   if ("horizontal" in padding) {
-    const vertical = sliceNum(padding.vertical);
-    const horizontal = sliceNum(padding.horizontal);
-    return [
-      "padding",
-      `EdgeInsets(top: ${vertical}, leading: ${horizontal}, bottom: ${vertical}, trailing: ${horizontal})`,
-    ];
+    pushPadding(result, padding.horizontal, "hor");
+    pushPadding(result, padding.vertical, "ver");
+    return result;
   }
 
-  const top = sliceNum(padding.top);
-  const left = sliceNum(padding.left);
-  const bottom = sliceNum(padding.bottom);
-  const right = sliceNum(padding.right);
-  return [
-    "padding",
-    `EdgeInsets(top: ${top}, leading: ${left}, bottom: ${bottom}, trailing: ${right})`,
-  ];
+  pushPadding(result, padding.top, "top");
+  pushPadding(result, padding.left, "left");
+  pushPadding(result, padding.bottom, "bottom");
+  pushPadding(result, padding.right, "right");
+
+  return result;
 };
+
+const pushPadding = (result: Modifier[], padding: number, operationName: string): void => {
+  if (padding === 0) {
+    result.push([`pad_${operationName}`, Math.round(padding)])
+  }
+}

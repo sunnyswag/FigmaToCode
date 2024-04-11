@@ -1,5 +1,3 @@
-import { sliceNum } from "./../common/numToAutoFixed";
-import { lvgluiPadding } from "./builderImpl/lvgluiPadding";
 import { lvgluiSize } from "./builderImpl/lvgluiSize";
 
 import {
@@ -12,9 +10,9 @@ import {
   getCommonPositionValue,
 } from "../common/commonPosition";
 import { Modifier, pushModifier } from "./builderImpl/lvgluiStyle";
-import { LvglUIStyle } from "./builderImpl/lvgluiStyle";
 
 export class LvgluiDefaultBuilder {
+  private readonly prefix = "lv_obj_"
   private currentNodeName: string;
   private parentNodeName: string;
   private styleIndex: number;
@@ -44,32 +42,12 @@ export class LvgluiDefaultBuilder {
     return this;
   }
 
-  topLeftToCenterOffset(
-    x: number,
-    y: number,
-    node: SceneNode,
-    parent: (BaseNode & ChildrenMixin) | null
-  ): { centerX: number; centerY: number } {
-    if (!parent || !("width" in parent)) {
-      return { centerX: 0, centerY: 0 };
-    }
-    // Find the child's center coordinates
-    const centerX = x + node.width / 2;
-    const centerY = y + node.height / 2;
-
-    // Calculate the center-based offset
-    const centerBasedX = centerX - parent.width / 2;
-    const centerBasedY = centerY - parent.height / 2;
-
-    return { centerX: centerBasedX, centerY: centerBasedY };
-  }
-
   position(node: SceneNode, optimizeLayout: boolean): this {
     if (commonIsAbsolutePosition(node, optimizeLayout)) {
       const { x, y } = getCommonPositionValue(node);
 
       this.pushModifier([
-        `lv_obj_align`,
+        `align`,
         `${this.parentNodeName}, ${Math.round(x)}, ${Math.round(y)}`,
       ]);
     }
@@ -78,28 +56,27 @@ export class LvgluiDefaultBuilder {
 
   size(node: SceneNode, optimize: boolean): this {
     const { width, height } = lvgluiSize(node, optimize);
-    const sizes = [width, height].filter((d) => d);
-    if (sizes.length > 0) {
-      this.pushModifier([`frame`, sizes.join(", ")]);
-    }
+      this.pushModifier([`set_size`, `${width}, ${height}`]);
 
-    return this;
-  }
-
-  autoLayoutPadding(node: SceneNode, optimizeLayout: boolean): this {
-    if ("paddingLeft" in node) {
-      this.pushModifier(
-        lvgluiPadding(
-          (optimizeLayout ? node.inferredAutoLayout : null) ?? node
-        )
-      );
-    }
     return this;
   }
 
   build(indentLevel: number = 0): string {
-    // this.element.element = kind;
-    return this.element.toString(indentLevel);
+    this.removeDefalutStyle();
+    this.addStyle();
+
+    return this.modifiers.map(([operation, parameter]) => {
+      const param = parameter ? `, ${parameter}` : "";
+      `${this.prefix}${operation}(${this.currentNodeName}${param});`;
+    }).join("\n")
+  }
+
+  private removeDefalutStyle(): this {
+    return this.pushModifier(["remove_style_all", ""])
+  }
+
+  private addStyle(): this {
+    return this.pushModifier(["add_style", `&style${this.styleIndex}, 0`])
   }
 
   private pushModifier(...args: (Modifier | [string | null, string | null] | null)[]): this {

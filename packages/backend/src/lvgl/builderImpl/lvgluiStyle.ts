@@ -1,4 +1,5 @@
 import { calculateContrastRatio } from "../../common/retrieveUI/commonUI";
+import { lvgluiPadding } from "./lvgluiPadding";
 import { lvgluiBlur, lvgluiShadow } from "./lvgluiEffects";
 import { blendModeEnum } from "./lvgluiBlend";
 import {
@@ -7,10 +8,11 @@ import {
 } from "./lvgluiBorder";
 import { lvgluiBackground } from "./lvgluiColor";
 
-export type Modifier = [string, string | Modifier | Modifier[] | number];
+export type Modifier = [string, string | Modifier | number];
 
 
 export class LvglUIStyle {
+    private readonly prefix = "lv_style_set_"
     static styleCache: Modifier[] = []
 
     static buildModifierAndGetIndex(node: SceneNode & LayoutMixin & MinimalBlendMixin): number {
@@ -34,7 +36,6 @@ export class LvglUIStyle {
       }
 
     private lvgluiBlendMode(node: MinimalBlendMixin): this {
-        // TODO: edit blend logic
         const fromBlendEnum = blendModeEnum(node);
         if (fromBlendEnum) {
             return this.pushModifier(["blend_mode", fromBlendEnum]);
@@ -73,6 +74,18 @@ export class LvglUIStyle {
         return this.pushModifier(lvgluiBlur(node), lvgluiShadow(node));   
     }
 
+    private layoutPadding(node: SceneNode, optimizeLayout: boolean): this {
+        if ("paddingLeft" in node) {
+            const result = lvgluiPadding(
+                (optimizeLayout ? node.inferredAutoLayout : null) ?? node
+            )
+            if (result) {
+                this.pushModifier(...result);
+            }
+        }
+        return this;
+      }
+
 
     private buildModifierLines(indentLevel: number): string {
         const indent = " ".repeat(indentLevel);
@@ -97,14 +110,14 @@ export class LvglUIStyle {
 
     toString(indentLevel = 0): string {
         if (this.modifiers.length === 0) {
-        return this.element;
+            return this.element;
         }
 
         const modifierLines = this.buildModifierLines(indentLevel + 2);
         return indentString(`${this.element}\n${modifierLines}`, 0);
     }
 
-    pushModifier(...args: (Modifier | [string | null, string | null]| null)[] ): this {
+    pushModifier(...args: (Modifier | [string | null, string | null]| null)[]): this {
         pushModifier(LvglUIStyle.styleCache, ...args);
         return this;
     }
