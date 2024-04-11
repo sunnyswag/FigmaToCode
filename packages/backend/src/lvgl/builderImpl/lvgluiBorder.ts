@@ -4,6 +4,32 @@ import { sliceNum } from "../../common/numToAutoFixed";
 import { lvglUISolidColor } from "./lvgluiColor";
 import { Modifier, LvglUIStyle } from "./lvgluiStyle";
 
+
+export const lvgluiBorder = (node: SceneNode): Modifier[] | null => {
+  if (!("strokes" in node) || !node.strokes || node.strokes.length === 0) {
+    return null;
+  }
+  
+  const width = lvglUIStroke(node);
+  const inset = strokeInset(node, width);
+  
+  if (!width) {
+    return null;
+  }
+  const color = lvglUISolidColor(node.strokes[0]);
+  if (!color) {
+    return null;
+  }
+  
+  return inset[0].flatMap((type) => {
+    return [
+      [`${type}_width`, inset[1]],
+      [`${type}_color`, color.color],
+      [`${type}_opa`, color.opacity]
+    ]
+  })
+};
+
 const lvglUIStroke = (node: SceneNode): number => {
   if (!("strokes" in node) || !node.strokes || node.strokes.length === 0) {
     return 0;
@@ -22,90 +48,28 @@ const lvglUIStroke = (node: SceneNode): number => {
   return Math.max(stroke.left, stroke.top, stroke.right, stroke.bottom);
 };
 
-/**
- * Generate border or an overlay with stroke.
- * In Flutter and Tailwind, setting the border sets for both fill and stroke. Not in lvglUI.
- * This method, therefore, only serves for the stroke/border and not for roundness of the layer behind.
- * Also, it only works when there is a fill. When there isn't, [lvgluiShapeStroke] should be used.
- *
- * @param node with hopefully a fill object in [node.strokes].
- * @returns a string with overlay, when there node has a corner radius, or just border. If no color is found in node.strokes, return "".
- */
-export const lvgluiBorder = (node: SceneNode): string[] | null => {
-  if (!("strokes" in node) || !node.strokes || node.strokes.length === 0) {
-    return null;
-  }
-
-  const width = lvglUIStroke(node);
-  const inset = strokeInset(node, width);
-
-  if (!width) {
-    return null;
-  }
-
-  return node.strokes
-    .map((stroke) => {
-      const strokeColor = lvglUISolidColor(stroke);
-
-      const strokeModifier: Modifier = [
-        "stroke",
-        `${strokeColor}, lineWidth: ${sliceNum(width)}`,
-      ];
-
-      if (strokeColor) {
-        return new LvglUIStyle(getViewType(node))
-          .pushModifier(inset)
-          .pushModifier(strokeModifier)
-          .toString();
-      }
-
-      return null;
-    })
-    .filter((d) => d !== null) as string[];
-};
-
-const getViewType = (node: SceneNode): string => {
-  if (node.type === "ELLIPSE") {
-    return "Ellipse()";
-  }
-
-  const corner = lvgluiCornerRadius(node);
-  if (corner) {
-    return `RoundedRectangle(cornerRadius: ${corner})`;
-  } else {
-    return "Rectangle()";
-  }
-};
-
 const strokeInset = (
   node: MinimalStrokesMixin,
   width: number
-): [string, string | null] => {
+): [string[], number] => {
   switch (node.strokeAlign) {
     case "INSIDE":
-      return ["inset", `by: ${sliceNum(width)}`];
+      return [["border"], width];
     case "OUTSIDE":
-      return ["inset", `by: -${sliceNum(width)}`];
+      return [["outline"], width];
     case "CENTER":
-      return ["inset", null];
+      return [["border", "outline"], width / 2];
   }
 };
 
-/**
- * Produce a Rectangle with border radius.
- * The reason this was extracted into its own method is for reusability in [lvgluiBorder],
- * where a RoundedRectangle is needed again to be part of the overlay.
- *
- * @param node with cornerRadius and topLeftRadius properties.
- * @returns a string with RoundedRectangle, if node has a corner larger than zero; else "".
- */
-export const lvgluiCornerRadius = (node: SceneNode): string => {
+
+export const lvgluiCornerRadius = (node: SceneNode): number | null => {
   const radius = getCommonRadius(node);
   if ("all" in radius) {
     if (radius.all > 0) {
-      return sliceNum(radius.all);
+      return Math.round(radius.all);
     } else {
-      return "";
+      return null;
     }
   }
 
@@ -118,10 +82,10 @@ export const lvgluiCornerRadius = (node: SceneNode): string => {
   );
 
   if (maxBorder > 0) {
-    return sliceNum(maxBorder);
+    return Math.round(maxBorder);
   }
 
-  return "";
+  return null;
 };
 
 /**

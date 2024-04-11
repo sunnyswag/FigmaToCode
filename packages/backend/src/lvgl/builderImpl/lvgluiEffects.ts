@@ -43,21 +43,3 @@ export const lvgluiShadow = (node: SceneNode): Modifier | null => {
 
   return ["shadow", comp.join(", ")];
 };
-
-export const lvgluiBlur = (node: SceneNode): Modifier | null => {
-  if (!("effects" in node) || node.effects.length === 0) {
-    return null;
-  }
-
-  const layerBlur: Array<BlurEffect> = node.effects.filter(
-    (d): d is BlurEffect => d.type === "LAYER_BLUR" && d.visible
-  );
-
-  if (layerBlur.length === 0) {
-    return null;
-  }
-
-  // retrieve first blur.
-  const blur = layerBlur[0].radius;
-  return ["blur", `radius: ${sliceNum(blur)})`];
-};

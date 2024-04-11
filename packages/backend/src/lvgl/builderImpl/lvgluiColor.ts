@@ -1,11 +1,17 @@
 import { retrieveTopFill } from "../../common/retrieveFill";
 import { gradientAngle } from "../../common/color";
 import { nearestValue } from "../../tailwind/conversionTables";
-import { sliceNum } from "../../common/numToAutoFixed";
+import { formatOpacity } from "./lvgluiBlend";
 
-export const lvglUISolidColor = (fill: Paint): string => {
+
+export type LvglColor = {
+  opacity: number,
+  color: string
+}
+
+export const lvglUISolidColor = (fill: Paint): LvglColor | null => {
   if (fill && fill.type === "SOLID") {
-    return lvgluiColor(fill.color, fill.opacity ?? 1.0);
+    return lvgluiColor(fill.color, fill.opacity);
   } else if (
     fill &&
     (fill.type === "GRADIENT_LINEAR" ||
@@ -13,16 +19,16 @@ export const lvglUISolidColor = (fill: Paint): string => {
       fill.type === "GRADIENT_RADIAL")
   ) {
     if (fill.gradientStops.length > 0) {
-      return lvgluiColor(fill.gradientStops[0].color, fill.opacity ?? 1.0);
+      return lvgluiColor(fill.gradientStops[0].color, fill.opacity);
     }
   }
 
-  return "";
+  return null;
 };
 
 export const lvgluiSolidColor = (
   fills: ReadonlyArray<Paint> | PluginAPI["mixed"]
-): string => {
+): LvglColor => {
   const fill = retrieveTopFill(fills);
 
   if (fill && fill.type === "SOLID") {
@@ -48,7 +54,7 @@ export const lvgluiSolidColor = (
 export const lvgluiBackground = (
   node: SceneNode,
   fills: ReadonlyArray<Paint> | PluginAPI["mixed"]
-): string => {
+): LvglColor => {
   const fill = retrieveTopFill(fills);
 
   if (fill && fill.type === "SOLID") {
@@ -102,23 +108,9 @@ const gradientDirection = (angle: number): string => {
 
 export const lvgluiRGBAColor = (color: RGBA) => lvgluiColor(color, color.a);
 
-export const lvgluiColor = (color: RGB, opacity: number): string => {
-  // Using Color.black.opacity() is not reccomended, as per:
-  // https://stackoverflow.com/a/56824114/4418073
-  // Therefore, only use Color.black/white when opacity is 1.
-  if (color.r + color.g + color.b === 0 && opacity === 1) {
-    return ".black";
-  }
-
-  if (color.r + color.g + color.b === 3 && opacity === 1) {
-    return ".white";
-  }
-
-  const r = `red: ${sliceNum(color.r)}`;
-  const g = `green: ${sliceNum(color.g)}`;
-  const b = `blue: ${sliceNum(color.b)}`;
-
-  const opacityAttr = opacity !== 1.0 ? `.opacity(${sliceNum(opacity)})` : "";
-
-  return `Color(${r}, ${g}, ${b})${opacityAttr}`;
+export const lvgluiColor = (color: RGB, opacity: number | undefined): LvglColor => {
+  return {
+    opacity: formatOpacity(opacity ?? 1.0),
+    color: `lv_color_make(${color.r}, ${color.g}, ${color.b})`
+  };
 };

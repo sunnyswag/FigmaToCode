@@ -1,6 +1,6 @@
 import { calculateContrastRatio } from "../../common/retrieveUI/commonUI";
 import { lvgluiPadding } from "./lvgluiPadding";
-import { lvgluiBlur, lvgluiShadow } from "./lvgluiEffects";
+import { lvgluiShadow } from "./lvgluiEffects";
 import { blendModeEnum } from "./lvgluiBlend";
 import {
   lvgluiBorder,
@@ -13,11 +13,17 @@ export type Modifier = [string, string | Modifier | number];
 
 export class LvglUIStyle {
     private readonly prefix = "lv_style_set_"
-    static styleCache: Modifier[] = []
+    private readonly currentStyle: Modifier[] = []
+    static styleCache: Modifier[][] = []
 
     static buildModifierAndGetIndex(node: SceneNode & LayoutMixin & MinimalBlendMixin): number {
         new LvglUIStyle()
+            .shapeBorder(node)
             .lvgluiBlendMode(node)
+            .shapeBackground(node)
+            .cornerRadius(node)
+            .effects(node)
+            .layoutPadding(node)
         return 0
     }
 
@@ -28,9 +34,7 @@ export class LvglUIStyle {
     private shapeBorder(node: SceneNode): this {
         const borders = lvgluiBorder(node);
         if (borders) {
-            borders.forEach((border) => {
-                this.pushModifier(["overlay", border]);
-            });
+            this.pushModifier(...borders);
         }
         return this;
       }
@@ -54,16 +58,12 @@ export class LvglUIStyle {
         return this;
     }
     
-    private shapeForeground(node: SceneNode): this {
-        if (!("children" in node) || node.children.length === 0) {
-            this.pushModifier([`foregroundColor`, ".clear"]);
-        }
-        return this;
-    }
-    
     private cornerRadius(node: SceneNode): this {
         const corner = lvgluiCornerRadius(node);
-        return this.pushModifier([`cornerRadius`, corner]);
+        if (corner) {
+            this.pushModifier([`radius`, corner]);
+        }
+        return this;
     }
     
     private effects(node: SceneNode): this {
@@ -71,10 +71,10 @@ export class LvglUIStyle {
             return this;
         }
         
-        return this.pushModifier(lvgluiBlur(node), lvgluiShadow(node));   
+        return this.pushModifier(lvgluiShadow(node));   
     }
 
-    private layoutPadding(node: SceneNode, optimizeLayout: boolean): this {
+    private layoutPadding(node: SceneNode, optimizeLayout: boolean = true): this {
         if ("paddingLeft" in node) {
             const result = lvgluiPadding(
                 (optimizeLayout ? node.inferredAutoLayout : null) ?? node
@@ -118,7 +118,7 @@ export class LvglUIStyle {
     }
 
     pushModifier(...args: (Modifier | [string | null, string | null]| null)[]): this {
-        pushModifier(LvglUIStyle.styleCache, ...args);
+        pushModifier(this.currentStyle, ...args);
         return this;
     }
 

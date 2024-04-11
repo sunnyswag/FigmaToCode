@@ -1,4 +1,3 @@
-import { sliceNum } from "../../common/numToAutoFixed";
 import { Modifier } from "./lvgluiStyle";
 
 /**
@@ -6,11 +5,14 @@ import { Modifier } from "./lvgluiStyle";
  */
 export const lvgluiOpacity = (node: MinimalBlendMixin): Modifier | null => {
   if (node.opacity !== undefined && node.opacity !== 1) {
-    let opacity = Math.max(0, Math.min(255, Math.round(node.opacity * 255)));
-    return ["set_style_opa", opacity];
+    return ["set_style_opa", formatOpacity(node.opacity)];
   }
   return null;
 };
+
+export const formatOpacity = (opacity: number): number => {
+  return Math.max(0, Math.min(255, Math.round(opacity * 255)));
+}
 
 export const lvgluiVisibility = (node: SceneNodeMixin): Modifier | null => {
   // [when testing] node.visible can be undefined
