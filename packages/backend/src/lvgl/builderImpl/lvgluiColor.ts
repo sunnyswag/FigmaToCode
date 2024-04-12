@@ -2,6 +2,7 @@ import { retrieveTopFill } from "../../common/retrieveFill";
 import { gradientAngle } from "../../common/color";
 import { nearestValue } from "../../tailwind/conversionTables";
 import { formatOpacity } from "./lvgluiBlend";
+import { Modifier } from "./lvgluiStyle";
 
 
 export type LvglColor = {
@@ -54,55 +55,49 @@ export const lvgluiSolidColor = (
 export const lvgluiBackground = (
   node: SceneNode,
   fills: ReadonlyArray<Paint> | PluginAPI["mixed"]
-): LvglColor => {
+): Modifier[] | null => {
   const fill = retrieveTopFill(fills);
 
   if (fill && fill.type === "SOLID") {
-    // opacity should only be null on set, not on get. But better be prevented.
-    const opacity = fill.opacity ?? 1.0;
-    return lvgluiColor(fill.color, opacity);
+    const item = lvgluiColor(fill.color, fill.opacity);
+    return [
+      ["bg_color", item.color],
+      ["bg_opa", item.opacity]
+    ];
   } else if (fill?.type === "GRADIENT_LINEAR") {
     return lvgluiGradient(fill);
   } else if (fill?.type === "IMAGE") {
-    return `AsyncImage(url: URL(string: "https://via.placeholder.com/${node.width.toFixed(
-      0
-    )}x${node.height.toFixed(0)}"))`;
+    return [
+      ["bg_image_src", "image_name"]
+    ];
   }
 
-  return "";
+  return null;
 };
 
-export const lvgluiGradient = (fill: GradientPaint): string => {
+export const lvgluiGradient = (fill: GradientPaint): Modifier[] => {
+  const result: Modifier[] = [];
+
   const direction = gradientDirection(gradientAngle(fill));
+  result.push(["bg_grad_dir", direction]);
 
-  const colors = fill.gradientStops
-    .map((d) => {
-      return lvgluiColor(d.color, d.color.a);
-    })
-    .join(", ");
+  const lastGradientStop = fill.gradientStops[fill.gradientStops.length - 1];
+  const gradientColor = lvgluiRGBAColor(lastGradientStop.color);
+  result.push(["bg_grad_color", gradientColor.color]);
+  result.push(["bg_grad_opa", gradientColor.opacity]);
 
-  return `LinearGradient(gradient: Gradient(colors: [${colors}]), ${direction})`;
+  return result;
 };
 
 const gradientDirection = (angle: number): string => {
-  switch (nearestValue(angle, [-180, -135, -90, -45, 0, 45, 90, 135, 180])) {
-    case 0:
-      return "startPoint: .leading, endPoint: .trailing";
-    case 45:
-      return "startPoint: .topLeading, endPoint: .bottomTrailing";
+  switch (nearestValue(angle, [-180, -90, 0, 90, 180])) {
     case 90:
-      return "startPoint: .top, endPoint: .bottom";
-    case 135:
-      return "startPoint: .topTrailing, endPoint: .bottomLeading";
-    case -45:
-      return "startPoint: .bottomLeading, endPoint: .topTrailing";
+      return "LV_GRAD_DIR_VER";
     case -90:
-      return "startPoint: .bottom, endPoint: .top";
-    case -135:
-      return "startPoint: .bottomTrailing, endPoint: .topLeading";
+      return "LV_GRAD_DIR_VER";
     default:
-      // 180 and -180
-      return "startPoint: .trailing, endPoint: .leading";
+      // 0, 180 and -180
+      return "LV_GRAD_DIR_HOR";
   }
 };
 

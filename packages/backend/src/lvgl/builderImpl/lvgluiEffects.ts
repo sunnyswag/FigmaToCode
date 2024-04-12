@@ -1,7 +1,7 @@
-import { sliceNum } from "../../common/numToAutoFixed";
 import { Modifier } from "./lvgluiStyle";
+import { lvgluiRGBAColor } from "./lvgluiColor";
 
-export const lvgluiShadow = (node: SceneNode): Modifier | null => {
+export const lvgluiShadow = (node: SceneNode): Modifier[] | null => {
   if (!("effects" in node) || node.effects.length === 0) {
     return null;
   }
@@ -16,30 +16,23 @@ export const lvgluiShadow = (node: SceneNode): Modifier | null => {
 
   // retrieve first shadow.
   const shadow = dropShadow[0];
-  let comp: string[] = [];
+  const result: Modifier[] = [];
 
-  const color = shadow.color;
-  // set color when not black with 0.25 of opacity, which is the Figma default. Round the alpha now to avoid rounding issues.
-  const a = sliceNum(color.a);
-  const r = sliceNum(color.r);
-  const g = sliceNum(color.g);
-  const b = sliceNum(color.b);
-  comp.push(`color: Color(red: ${r}, green: ${g}, blue: ${b}, opacity: ${a})`);
-  comp.push(`radius: ${sliceNum(shadow.radius)}`);
-
-  const x = shadow.offset.x > 0 ? `x: ${sliceNum(shadow.offset.x)}` : "";
-  const y = shadow.offset.y > 0 ? `y: ${sliceNum(shadow.offset.y)}` : "";
-
-  // add initial comma since this is an optional paramater and radius must come first.
-  if (x && y) {
-    comp.push(x, y);
-  } else {
-    if (x) {
-      comp.push(x);
-    } else if (y) {
-      comp.push(y);
-    }
+  const color = lvgluiRGBAColor(shadow.color);
+  result.push(["shadow_color", color.color]);
+  result.push(["shadow_opa", color.opacity]);
+  result.push(["shadow_width", Math.round(shadow.radius)]);
+  if (shadow.spread) {
+    result.push(["shadow_spread", Math.round(shadow.spread)]);
   }
 
-  return ["shadow", comp.join(", ")];
+  if (shadow.offset.x) {
+    result.push(["shadow_ofs_x", Math.round(shadow.offset.x)]);
+  }
+
+  if (shadow.offset.y) {
+    result.push(["shadow_ofs_y", Math.round(shadow.offset.y)]);
+  }
+
+  return result;
 };

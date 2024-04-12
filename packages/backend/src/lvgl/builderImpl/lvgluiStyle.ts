@@ -1,4 +1,3 @@
-import { calculateContrastRatio } from "../../common/retrieveUI/commonUI";
 import { lvgluiPadding } from "./lvgluiPadding";
 import { lvgluiShadow } from "./lvgluiEffects";
 import { blendModeEnum } from "./lvgluiBlend";
@@ -12,19 +11,40 @@ export type Modifier = [string, string | Modifier | number];
 
 
 export class LvglUIStyle {
-    private readonly prefix = "lv_style_set_"
-    private readonly currentStyle: Modifier[] = []
-    static styleCache: Modifier[][] = []
+    static readonly prefix = "lv_style_set_";
+    static styleCache: LvglUIStyle[] = [];
+    readonly currentStyle: Modifier[] = [];
 
     static buildModifierAndGetIndex(node: SceneNode & LayoutMixin & MinimalBlendMixin): number {
-        new LvglUIStyle()
+        const indexOfUsingEquals = (newStyle: LvglUIStyle): number => {
+            for (let i = 0; i < LvglUIStyle.styleCache.length; i++) {
+                if (newStyle.equals(LvglUIStyle.styleCache[i]))
+                    return i;
+            }
+            return -1;
+        }
+        
+        const newStyle = new LvglUIStyle()
             .shapeBorder(node)
             .lvgluiBlendMode(node)
             .shapeBackground(node)
             .cornerRadius(node)
             .effects(node)
-            .layoutPadding(node)
-        return 0
+            .layoutPadding(node);
+        
+        const index = indexOfUsingEquals(newStyle)
+        if (index != -1) {
+            return index;
+        } else {
+            LvglUIStyle.styleCache.push(newStyle);
+            return LvglUIStyle.styleCache.length - 1;
+        }
+    }
+
+    static buildAllStyle(): string {
+        return LvglUIStyle.styleCache.map((style, index) => {
+            return style.buildStyle(index);
+        }).join("\n");
     }
 
     static clearCachedUIModifier() {
@@ -52,7 +72,7 @@ export class LvglUIStyle {
         if ("fills" in node) {
             const background = lvgluiBackground(node, node.fills);
             if (background) {
-                this.pushModifier([`background`, background]);
+                this.pushModifier(...background);
             }
         }
         return this;
@@ -68,10 +88,16 @@ export class LvglUIStyle {
     
     private effects(node: SceneNode): this {
         if (node.type === "GROUP") {
+            // TODO why GROUP no need shadow ?
             return this;
         }
+
+        const shadow = lvgluiShadow(node);
+        if (shadow) {
+            this.pushModifier(...shadow);
+        }
         
-        return this.pushModifier(lvgluiShadow(node));   
+        return this;   
     }
 
     private layoutPadding(node: SceneNode, optimizeLayout: boolean = true): this {
@@ -86,42 +112,31 @@ export class LvglUIStyle {
         return this;
       }
 
-
-    private buildModifierLines(indentLevel: number): string {
-        const indent = " ".repeat(indentLevel);
-        return this.modifiers
-        .map(([property, value]) =>
-            Array.isArray(value)
-            ? `${indent}.${property}(${new LvglUIElement(
-                property,
-                value as Modifier[]
-                )
-                .toString()
-                .trim()})`
-            : value.length > 60
-            ? `${indent}.${property}(\n${indentString(
-                value,
-                indentLevel + 2
-                )}\n${indent})`
-            : `${indent}.${property}(${value})`
-        )
-        .join("\n");
+    private buildStyle(index: number) {
+        return this.currentStyle.map(([operation, parameter]) => {
+            const param = parameter ? `, ${parameter}` : "";
+            return `${LvglUIStyle.prefix}${operation}(style${index}${param});`;
+        }).join("\n");
     }
 
-    toString(indentLevel = 0): string {
-        if (this.modifiers.length === 0) {
-            return this.element;
+    equals(other: LvglUIStyle) {
+        if (this.currentStyle.length != other.currentStyle.length) {
+            return false;
+        }
+        
+        for (let i = 0; i < this.currentStyle.length; i++) {
+            if (this.currentStyle[i][0] != other.currentStyle[i][0] 
+                || this.currentStyle[i][1] != other.currentStyle[i][1]
+            ) return false;
         }
 
-        const modifierLines = this.buildModifierLines(indentLevel + 2);
-        return indentString(`${this.element}\n${modifierLines}`, 0);
+        return true;
     }
 
     pushModifier(...args: (Modifier | [string | null, string | null]| null)[]): this {
         pushModifier(this.currentStyle, ...args);
         return this;
     }
-
 }
 
 export const pushModifier = (

@@ -68,7 +68,7 @@ export class LvgluiDefaultBuilder {
     return this.modifiers.map(([operation, parameter]) => {
       const param = parameter ? `, ${parameter}` : "";
       `${this.prefix}${operation}(${this.currentNodeName}${param});`;
-    }).join("\n")
+    }).join("\n") + "\n";
   }
 
   private removeDefalutStyle(): this {
