@@ -2,8 +2,7 @@ import { retrieveTopFill } from "../../common/retrieveFill";
 import { gradientAngle } from "../../common/color";
 import { nearestValue } from "../../tailwind/conversionTables";
 import { formatOpacity } from "./lvgluiBlend";
-import { Modifier } from "./lvgluiStyle";
-
+import { Modifier } from "./style/styleUtils";
 
 export type LvglColor = {
   opacity: number,

@@ -4,7 +4,7 @@ import { LvgluiTextBuilder } from "./lvgluiTextBuilder";
 import { LvgluiDefaultBuilder } from "./lvgluiDefaultBuilder";
 import { PluginSettings } from "../code";
 import { commonSortChildrenWhenInferredAutoLayout } from "../common/commonChildrenOrder";
-import { LvglUIStyle } from "./builderImpl/lvgluiStyle";
+import { LvglUIStyle } from "./builderImpl/style/lvgluiStyle";
 
 let localSettings: PluginSettings;
 

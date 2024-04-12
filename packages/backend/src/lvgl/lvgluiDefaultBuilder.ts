@@ -9,7 +9,7 @@ import {
   commonIsAbsolutePosition,
   getCommonPositionValue,
 } from "../common/commonPosition";
-import { Modifier, pushModifier } from "./builderImpl/lvgluiStyle";
+import { Modifier, pushModifier } from "./builderImpl/style/styleUtils";
 
 export class LvgluiDefaultBuilder {
   private readonly prefix = "lv_obj_"

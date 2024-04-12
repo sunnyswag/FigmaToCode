@@ -1,4 +1,4 @@
-import { Modifier } from "./lvgluiStyle";
+import { Modifier } from "./style/styleUtils";
 
 /**
  * https://developer.apple.com/documentation/lvglui/view/opacity(_:)

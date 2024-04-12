@@ -1,5 +1,5 @@
 import { commonPadding } from "../../common/commonPadding";
-import { Modifier } from "./lvgluiStyle";
+import { Modifier } from "./style/styleUtils";
 
 export const lvgluiPadding = (
   node: InferredAutoLayoutResult

@@ -1,4 +1,4 @@
-import { Modifier } from "./lvgluiStyle";
+import { Modifier } from "./style/styleUtils";
 import { lvgluiRGBAColor } from "./lvgluiColor";
 
 export const lvgluiShadow = (node: SceneNode): Modifier[] | null => {

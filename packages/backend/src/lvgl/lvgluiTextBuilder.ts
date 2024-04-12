@@ -7,7 +7,7 @@ import { LvgluiDefaultBuilder } from "./lvgluiDefaultBuilder";
 import { lvgluiWeightMatcher } from "./builderImpl/lvgluiTextWeight";
 import { lvgluiSize } from "./builderImpl/lvgluiSize";
 import { globalTextModifierSegments } from "../altNodes/altConversion";
-import { LvglUIStyle } from "./builderImpl/lvgluiStyle";
+import { LvglUIStyle } from "./builderImpl/style/lvgluiStyle";
 import { parseTextAsCode } from "../flutter/flutterTextBuilder";
 import { lvgluiSolidColor } from "./builderImpl/lvgluiColor";
 

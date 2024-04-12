@@ -1,8 +1,7 @@
 import { commonStroke } from "../../common/commonStroke";
 import { getCommonRadius } from "../../common/commonRadius";
 import { lvglUISolidColor } from "./lvgluiColor";
-import { Modifier, LvglUIStyle } from "./lvgluiStyle";
-
+import { Modifier } from "./style/styleUtils";
 
 export const lvgluiBorder = (node: SceneNode): Modifier[] | null => {
   if (!("strokes" in node) || !node.strokes || node.strokes.length === 0) {
