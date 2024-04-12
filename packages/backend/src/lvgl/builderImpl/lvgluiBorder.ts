@@ -1,6 +1,5 @@
 import { commonStroke } from "../../common/commonStroke";
 import { getCommonRadius } from "../../common/commonRadius";
-import { sliceNum } from "../../common/numToAutoFixed";
 import { lvglUISolidColor } from "./lvgluiColor";
 import { Modifier, LvglUIStyle } from "./lvgluiStyle";
 
@@ -21,9 +20,9 @@ export const lvgluiBorder = (node: SceneNode): Modifier[] | null => {
     return null;
   }
   
-  return inset[0].flatMap((type) => {
+  return inset.strokeType.flatMap((type) => {
     return [
-      [`${type}_width`, inset[1]],
+      [`${type}_width`, inset.width],
       [`${type}_color`, color.color],
       [`${type}_opa`, color.opacity]
     ]
@@ -51,14 +50,26 @@ const lvglUIStroke = (node: SceneNode): number => {
 const strokeInset = (
   node: MinimalStrokesMixin,
   width: number
-): [string[], number] => {
+): {
+  strokeType: string[],
+  width: number
+} => {
   switch (node.strokeAlign) {
     case "INSIDE":
-      return [["border"], width];
+      return {
+        strokeType: ["border"],
+        width: width
+      };
     case "OUTSIDE":
-      return [["outline"], width];
+      return {
+        strokeType: ["outline"],
+        width: width
+      };
     case "CENTER":
-      return [["border", "outline"], width / 2];
+      return {
+        strokeType: ["border", "outline"],
+        width: width / 2
+      };
   }
 };
 
