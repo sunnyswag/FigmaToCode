@@ -10,7 +10,7 @@ import { Modifier, pushModifier } from "./styleUtils";
 import { IStyle } from "./IStyle";
 
 export class LvglUIStyle implements IStyle {
-    static readonly prefix = "lv_style_set_";
+    prefix = "lv_style_set_";
     readonly currentStyle: Modifier[] = [];
 
     construct(node: SceneNode & LayoutMixin & MinimalBlendMixin): LvglUIStyle {
@@ -26,7 +26,7 @@ export class LvglUIStyle implements IStyle {
     toString(index: number): string {
         return this.currentStyle.map(([operation, parameter]) => {
             const param = parameter ? `, ${parameter}` : "";
-            return `${LvglUIStyle.prefix}${operation}(style${index}${param});`;
+            return `${this.prefix}${operation}(style${index}${param});`;
         }).join("\n");
     }
 
