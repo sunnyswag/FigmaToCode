@@ -13,7 +13,7 @@ export class LvglUIStyle implements IStyle {
     prefix = "lv_style_set_";
     readonly currentStyle: Modifier[] = [];
 
-    construct(node: SceneNode & LayoutMixin & MinimalBlendMixin): LvglUIStyle {
+    static construct(node: SceneNode): LvglUIStyle {
         const instance = new LvglUIStyle();
         instance.constructCommonUIStyle(node);
         return instance;
@@ -40,9 +40,11 @@ export class LvglUIStyle implements IStyle {
         return true;
     }
 
-    protected constructCommonUIStyle(node: SceneNode & LayoutMixin & MinimalBlendMixin) {
+    protected constructCommonUIStyle(node: SceneNode) {
         this.shapeBorder(node);
-        this.lvgluiBlendMode(node);
+        if ("layoutAlign" in node && "opacity" in node) {
+            this.lvgluiBlendMode(node);
+        }
         this.shapeBackground(node);
         this.cornerRadius(node);
         this.effects(node);

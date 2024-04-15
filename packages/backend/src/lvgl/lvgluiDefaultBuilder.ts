@@ -1,5 +1,4 @@
 import { lvgluiSize } from "./builderImpl/lvgluiSize";
-
 import {
   lvgluiVisibility,
   lvgluiOpacity,
@@ -9,22 +8,21 @@ import {
   commonIsAbsolutePosition,
   getCommonPositionValue,
 } from "../common/commonPosition";
-import { Modifier, pushModifier } from "./builderImpl/style/styleUtils";
+import { Modifier, getStyleIndex, pushModifier } from "./builderImpl/style/styleUtils";
+import { LvglUIStyle } from "./builderImpl/style/lvgluiStyle";
+
+let nodeIndex: number = 0
+export const resetNodeIndex = () => { nodeIndex = 0 };
 
 export class LvgluiDefaultBuilder {
   private readonly prefix = "lv_obj_"
-  protected currentNodeName: string;
+  protected currentNodeName = `obj_${nodeIndex}`;
   protected parentNodeName: string;
-  private styleIndex: number;
   private modifiers: Modifier[] = []
 
-  constructor(
-    currentNodeName: string, styleIndex: number, 
-    parentNodeName: string = "lv_screen_active()"
-  ) {
-    this.currentNodeName = currentNodeName;
-    this.styleIndex = styleIndex;
+  constructor(parentNodeName: string = "lv_screen_active()") {
     this.parentNodeName = parentNodeName;
+    nodeIndex++;
   }
 
   buildModifier(node: SceneNode, optimizeLayout: boolean) {
@@ -35,7 +33,7 @@ export class LvgluiDefaultBuilder {
     }
     this.size(node, optimizeLayout);
     this.removeDefalutStyle();
-    this.addStyle();
+    this.addStyle(node);
   }
 
   toString(): string {
@@ -76,8 +74,9 @@ export class LvgluiDefaultBuilder {
     this.pushModifier(["remove_style_all", ""])
   }
 
-  private addStyle() {
-    this.pushModifier(["add_style", `&style${this.styleIndex}, 0`])
+  private addStyle(node: SceneNode) {
+    const styleIndex = getStyleIndex(LvglUIStyle.construct(node));
+    this.pushModifier(["add_style", `&style${styleIndex}, 0`])
   }
 
   protected pushModifier(...args: (Modifier | [string | null, string | null] | null)[]) {

@@ -3,7 +3,7 @@ import { IStyle } from "./iStyle";
 export type Modifier = [string, string | Modifier | number];
 const styleCache: IStyle[] = [];
 
-export const buildModifierAndGetIndex = (iStyle: IStyle, node: SceneNode & LayoutMixin & MinimalBlendMixin): number => {
+export const getStyleIndex = (iStyle: IStyle): number => {
     const indexOfUsingEquals = (iStyle: IStyle): number => {
         for (let i = 0; i < styleCache.length; i++) {
             if (iStyle.equals(styleCache[i]))
@@ -12,12 +12,11 @@ export const buildModifierAndGetIndex = (iStyle: IStyle, node: SceneNode & Layou
         return -1;
     }
     
-    const newStyle = iStyle.construct(node);
-    const index = indexOfUsingEquals(newStyle)
+    const index = indexOfUsingEquals(iStyle)
     if (index != -1) {
         return index;
     } else {
-        styleCache.push(newStyle);
+        styleCache.push(iStyle);
         return styleCache.length - 1;
     }
 }
@@ -28,7 +27,7 @@ export const allStyleToString = (): string => {
     }).join("\n");
 }
 
-export const clearCachedUIModifier = () => {
+export const clearCachedUIStyle = () => {
     styleCache.splice(0, styleCache.length);
 }
 

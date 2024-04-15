@@ -6,7 +6,7 @@ import { commonLetterSpacing, commonLineHeight } from "../../../common/commonTex
 export class LVglUITextStyle extends LvglUIStyle {
     prefix = "lv_style_set_text_";
 
-    construct(node: SceneNode & LayoutMixin & MinimalBlendMixin & TextNode): LVglUITextStyle {
+    static construct(node: SceneNode & LayoutMixin & MinimalBlendMixin & TextNode): LVglUITextStyle {
         const segment = this.getSegemnt(node);
         const instance = new LVglUITextStyle();
 
@@ -26,7 +26,7 @@ export class LVglUITextStyle extends LvglUIStyle {
         this.setFont(segment);
     }
 
-    private getSegemnt(node: TextNode): StyledTextSegment | null {
+    private static getSegemnt(node: TextNode): StyledTextSegment | null {
         const segments = globalTextStyleSegments[node.id];
         if (segments == null) {
             return null;
