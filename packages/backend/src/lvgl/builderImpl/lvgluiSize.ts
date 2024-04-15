@@ -1,42 +1,22 @@
 import { nodeSize } from "../../common/nodeWidthHeight";
-import { sliceNum } from "../../common/numToAutoFixed";
 
 export const lvgluiSize = (
   node: SceneNode,
   optimizeLayout: boolean
 ): { width: string; height: string } => {
-  // TODO: process flex layout
   const size = nodeSize(node, optimizeLayout);
-
-  // if width is set as maxWidth, height must also be set as maxHeight (not height)
-  const shouldExtend = size.height === "fill" || size.width === "fill";
-
-  // this cast will always be true, since nodeWidthHeight was called with false to relative.
-  let propWidth = "";
-  if (typeof size.width === "number") {
-    const w = sliceNum(size.width);
-
-    if (shouldExtend) {
-      propWidth = `minWidth: ${w}, maxWidth: ${w}`;
-    } else {
-      propWidth = `width: ${w}`;
-    }
-  } else if (size.width === "fill") {
-    propWidth = `maxWidth: .infinity`;
-  }
-
-  let propHeight = "";
-  if (typeof size.height === "number") {
-    const h = sliceNum(size.height);
-
-    if (shouldExtend) {
-      propHeight = `minHeight: ${h}, maxHeight: ${h}`;
-    } else {
-      propHeight = `height: ${h}`;
-    }
-  } else if (size.height === "fill") {
-    propHeight = `maxHeight: .infinity`;
-  }
+  const propWidth = processSize(size.width);
+  const propHeight = processSize(size.height);
 
   return { width: propWidth, height: propHeight };
 };
+
+const processSize = (length: "fill" | number | null): string => {
+  if (typeof length === "number") {
+    return Math.round(length).toString();
+  } else if (length === "fill") {
+    return "LV_SIZE_CONTENT";
+  } else {
+    return "LV_SIZE_CONTENT";
+  }
+}
