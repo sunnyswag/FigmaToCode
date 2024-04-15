@@ -1,11 +1,9 @@
 import { indentString } from "../common/indentString";
-import { sliceNum } from "../common/numToAutoFixed";
 import { LvgluiTextBuilder } from "./lvgluiTextBuilder";
 import { LvgluiDefaultBuilder, resetNodeIndex } from "./lvgluiDefaultBuilder";
 import { PluginSettings } from "../code";
 import { commonSortChildrenWhenInferredAutoLayout } from "../common/commonChildrenOrder";
-import { clearCachedUIStyle, getStyleIndex } from "./builderImpl/style/styleUtils";
-import { LvglUIStyle } from "./builderImpl/style/lvgluiStyle";
+import { clearCachedUIStyle } from "./builderImpl/style/styleUtils";
 
 let localSettings: PluginSettings;
 
@@ -94,7 +92,7 @@ export const lvgluiContainer = (
   const result = new LvgluiDefaultBuilder(parentNodeName);
   result.buildModifier(node, localSettings.optimizeLayout);
 
-  return `${stack}\n\n${result.toString()}`;
+  return `${result.toString()}\n\n${stack}`;
 };
 
 const lvgluiGroup = (
@@ -118,80 +116,9 @@ const lvgluiFrame = (
 ): string => {
   const children = widgetGeneratorWithLimits(node, parentNodeName);
 
-  const anyStack = createDirectionalStack(
-    children,
-    localSettings.optimizeLayout && node.inferredAutoLayout !== null
-      ? node.inferredAutoLayout
-      : node
-  );
-  return lvgluiContainer(node, anyStack);
-};
-
-const createDirectionalStack = (
-  children: string,
-  inferredAutoLayout: InferredAutoLayoutResult
-): string => {
-  if (inferredAutoLayout.layoutMode !== "NONE") {
-    return generatelvglViewCode(
-      inferredAutoLayout.layoutMode === "HORIZONTAL" ? "HStack" : "VStack",
-      {
-        alignment: getLayoutAlignment(inferredAutoLayout),
-        spacing: getSpacing(inferredAutoLayout),
-      },
-      children
-    );
-  } else {
-    return generatelvglViewCode("ZStack", {}, children);
-  }
-};
-
-const getLayoutAlignment = (
-  inferredAutoLayout: InferredAutoLayoutResult
-): string => {
-  switch (inferredAutoLayout.counterAxisAlignItems) {
-    case "MIN":
-      return inferredAutoLayout.layoutMode === "VERTICAL" ? ".leading" : ".top";
-    case "MAX":
-      return inferredAutoLayout.layoutMode === "VERTICAL"
-        ? ".trailing"
-        : ".bottom";
-    case "BASELINE":
-      return ".firstTextBaseline";
-    case "CENTER":
-      return "";
-  }
-};
-
-const getSpacing = (inferredAutoLayout: InferredAutoLayoutResult): number => {
-  const defaultSpacing = 10;
-  return Math.round(inferredAutoLayout.itemSpacing) !== defaultSpacing
-    ? inferredAutoLayout.itemSpacing
-    : defaultSpacing;
-};
-
-export const generatelvglViewCode = (
-  className: string,
-  properties: Record<string, string | number>,
-  children: string
-): string => {
-  const propertiesArray = Object.entries(properties)
-    .filter(([, value]) => value !== "")
-    .map(
-      ([key, value]) =>
-        `${key}: ${typeof value === "number" ? sliceNum(value) : value}`
-    );
-
-  const compactPropertiesArray = propertiesArray.join(", ");
-  if (compactPropertiesArray.length > 60) {
-    const formattedProperties = propertiesArray.join(",\n");
-    return `${className}(\n${formattedProperties}\n) {${indentString(
-      children
-    )}\n}`;
-  }
-
-  return `${className}(${compactPropertiesArray}) {\n${indentString(
-    children
-  )}\n}`;
+  const parentNode = new LvgluiDefaultBuilder(parentNodeName);
+  parentNode.buildModifier(node, localSettings.optimizeLayout);
+  return lvgluiContainer(node, parentNode.currentNodeName, children);
 };
 
 const widgetGeneratorWithLimits = (

@@ -15,9 +15,9 @@ let nodeIndex: number = 0
 export const resetNodeIndex = () => { nodeIndex = 0 };
 
 export class LvgluiDefaultBuilder {
-  private readonly prefix = "lv_obj_"
-  protected currentNodeName = `obj_${nodeIndex}`;
+  currentNodeName = `obj_${nodeIndex}`;
   protected parentNodeName: string;
+  private readonly prefix = "lv_obj_"
   private modifiers: Modifier[] = []
 
   constructor(parentNodeName: string = "lv_screen_active()") {
