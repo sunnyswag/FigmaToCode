@@ -3,7 +3,7 @@ import { LvgluiTextBuilder } from "./lvgluiTextBuilder";
 import { LvgluiDefaultBuilder, resetNodeIndex } from "./lvgluiDefaultBuilder";
 import { PluginSettings } from "../code";
 import { commonSortChildrenWhenInferredAutoLayout } from "../common/commonChildrenOrder";
-import { clearCachedUIStyle } from "./builderImpl/style/styleUtils";
+import { allStyleToString, clearCachedUIStyle } from "./builderImpl/style/styleUtils";
 
 let localSettings: PluginSettings;
 
@@ -22,6 +22,7 @@ export const lvgluiMain = (
   clearCachedUIStyle();
   resetNodeIndex();
   let result = lvgluiWidgetGenerator(sceneNode);
+  result = allStyleToString() + result;
 
   switch (localSettings.lvglUIGenerationMode) {
     case "snippet":
@@ -92,7 +93,7 @@ export const lvgluiContainer = (
   const result = new LvgluiDefaultBuilder(parentNodeName);
   result.buildModifier(node, localSettings.optimizeLayout);
 
-  return `${result.toString()}\n\n${stack}`;
+  return `${result.toString()}${stack}`;
 };
 
 const lvgluiGroup = (

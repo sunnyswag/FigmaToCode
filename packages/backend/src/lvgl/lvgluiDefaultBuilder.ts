@@ -15,7 +15,7 @@ let nodeIndex: number = 0
 export const resetNodeIndex = () => { nodeIndex = 0 };
 
 export class LvgluiDefaultBuilder {
-  currentNodeName = `obj_${nodeIndex}`;
+  currentNodeName = `obj${nodeIndex}`;
   protected parentNodeName: string;
   private readonly prefix = "lv_obj_"
   private modifiers: Modifier[] = []
@@ -38,9 +38,11 @@ export class LvgluiDefaultBuilder {
 
   toString(): string {
     return this.modifiers.map(([operation, parameter]) => {
+      // TODO fix ", "
       const param = parameter ? `, ${parameter}` : "";
       const prefix = operation.match("lv") == null ? this.prefix : "";
-      `${prefix}${operation}(${this.currentNodeName}${param});`;
+      const currentNodeName = operation.match("create") == null ? this.currentNodeName : "";
+      return `${prefix}${operation}(${currentNodeName}${param});`;
     }).join("\n") + "\n";
   }
 

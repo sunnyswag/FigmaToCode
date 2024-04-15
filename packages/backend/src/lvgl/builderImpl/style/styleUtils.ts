@@ -24,7 +24,7 @@ export const getStyleIndex = (iStyle: IStyle): number => {
 export const allStyleToString = (): string => {
     return styleCache.map((style, index) => {
         return style.toString(index);
-    }).join("\n");
+    }).join("\n\n") + "\n\n";
 }
 
 export const clearCachedUIStyle = () => {
