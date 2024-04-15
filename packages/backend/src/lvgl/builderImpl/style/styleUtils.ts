@@ -1,4 +1,4 @@
-import { IStyle } from "./IStyle";
+import { IStyle } from "./iStyle";
 
 export type Modifier = [string, string | Modifier | number];
 const styleCache: IStyle[] = [];

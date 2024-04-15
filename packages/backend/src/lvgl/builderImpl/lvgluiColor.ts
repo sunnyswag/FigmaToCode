@@ -26,33 +26,20 @@ export const lvglUISolidColor = (fill: Paint): LvglColor | null => {
   return null;
 };
 
-export const lvgluiSolidColor = (
+export const lvgluiTextColor = (
   fills: ReadonlyArray<Paint> | PluginAPI["mixed"]
-): LvglColor => {
-  const fill = retrieveTopFill(fills);
-
-  if (fill && fill.type === "SOLID") {
-    // opacity should only be null on set, not on get. But better be prevented.
-    const opacity = fill.opacity ?? 1.0;
-    return lvgluiColor(fill.color, opacity);
-  } else if (fill?.type === "GRADIENT_LINEAR") {
-    return lvgluiRGBAColor(fill.gradientStops[0].color);
-  } else if (fill?.type === "IMAGE") {
-    return lvgluiColor(
-      {
-        r: 0.5,
-        g: 0.23,
-        b: 0.27,
-      },
-      0.5
-    );
-  }
-
-  return "";
+): Modifier[] | null => {
+  return lvglCommonColorLogic("", fills);
 };
 
 export const lvgluiBackground = (
-  node: SceneNode,
+  fills: ReadonlyArray<Paint> | PluginAPI["mixed"]
+): Modifier[] | null => {
+  return lvglCommonColorLogic("bg_", fills);
+};
+
+const lvglCommonColorLogic = (
+  prefix: string, 
   fills: ReadonlyArray<Paint> | PluginAPI["mixed"]
 ): Modifier[] | null => {
   const fill = retrieveTopFill(fills);
@@ -60,30 +47,30 @@ export const lvgluiBackground = (
   if (fill && fill.type === "SOLID") {
     const item = lvgluiColor(fill.color, fill.opacity);
     return [
-      ["bg_color", item.color],
-      ["bg_opa", item.opacity]
+      [`${prefix}color`, item.color],
+      [`${prefix}opa`, item.opacity]
     ];
   } else if (fill?.type === "GRADIENT_LINEAR") {
-    return lvgluiGradient(fill);
+    return lvgluiGradient(prefix, fill);
   } else if (fill?.type === "IMAGE") {
     return [
-      ["bg_image_src", "image_name"]
+      [`${prefix}image_src`, "image_name"]
     ];
   }
 
   return null;
-};
+}
 
-export const lvgluiGradient = (fill: GradientPaint): Modifier[] => {
+const lvgluiGradient = (prefix: string, fill: GradientPaint): Modifier[] => {
   const result: Modifier[] = [];
 
   const direction = gradientDirection(gradientAngle(fill));
-  result.push(["bg_grad_dir", direction]);
+  result.push([`${prefix}grad_dir`, direction]);
 
   const lastGradientStop = fill.gradientStops[fill.gradientStops.length - 1];
   const gradientColor = lvgluiRGBAColor(lastGradientStop.color);
-  result.push(["bg_grad_color", gradientColor.color]);
-  result.push(["bg_grad_opa", gradientColor.opacity]);
+  result.push([`${prefix}grad_color`, gradientColor.color]);
+  result.push([`${prefix}grad_opa`, gradientColor.opacity]);
 
   return result;
 };

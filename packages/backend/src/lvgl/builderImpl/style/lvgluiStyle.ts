@@ -7,20 +7,16 @@ import {
 } from "../lvgluiBorder";
 import { lvgluiBackground } from "../lvgluiColor";
 import { Modifier, pushModifier } from "./styleUtils";
-import { IStyle } from "./IStyle";
+import { IStyle } from "./iStyle";
 
 export class LvglUIStyle implements IStyle {
     prefix = "lv_style_set_";
     readonly currentStyle: Modifier[] = [];
 
     construct(node: SceneNode & LayoutMixin & MinimalBlendMixin): LvglUIStyle {
-        return new LvglUIStyle()
-            .shapeBorder(node)
-            .lvgluiBlendMode(node)
-            .shapeBackground(node)
-            .cornerRadius(node)
-            .effects(node)
-            .layoutPadding(node);
+        const instance = new LvglUIStyle();
+        instance.constructCommonUIStyle(node);
+        return instance;
     }
 
     toString(index: number): string {
@@ -44,61 +40,62 @@ export class LvglUIStyle implements IStyle {
         return true;
     }
 
-    pushModifier(...args: (Modifier | [string | null, string | null]| null)[]): this {
-        pushModifier(this.currentStyle, ...args);
-        return this;
+    protected constructCommonUIStyle(node: SceneNode & LayoutMixin & MinimalBlendMixin) {
+        this.shapeBorder(node);
+        this.lvgluiBlendMode(node);
+        this.shapeBackground(node);
+        this.cornerRadius(node);
+        this.effects(node);
+        this.layoutPadding(node);
     }
 
-    private shapeBorder(node: SceneNode): this {
+    protected pushModifier(...args: (Modifier | [string | null, string | null]| null)[]) {
+        pushModifier(this.currentStyle, ...args);
+    }
+
+    protected shapeBorder(node: SceneNode) {
         const borders = lvgluiBorder(node);
         if (borders) {
             this.pushModifier(...borders);
         }
-        return this;
       }
 
-    private lvgluiBlendMode(node: MinimalBlendMixin): this {
+    protected lvgluiBlendMode(node: MinimalBlendMixin) {
         const fromBlendEnum = blendModeEnum(node);
         if (fromBlendEnum) {
-            return this.pushModifier(["blend_mode", fromBlendEnum]);
+            this.pushModifier(["blend_mode", fromBlendEnum]);
         }
-        
-        return this;
     }
     
-    private shapeBackground(node: SceneNode): this {
+    protected shapeBackground(node: SceneNode) {
         if ("fills" in node) {
-            const background = lvgluiBackground(node, node.fills);
+            const background = lvgluiBackground(node.fills);
             if (background) {
                 this.pushModifier(...background);
             }
         }
-        return this;
     }
     
-    private cornerRadius(node: SceneNode): this {
+    protected cornerRadius(node: SceneNode) {
         const corner = lvgluiCornerRadius(node);
         if (corner) {
             this.pushModifier([`radius`, corner]);
         }
-        return this;
     }
     
-    private effects(node: SceneNode): this {
+    protected effects(node: SceneNode) {
         if (node.type === "GROUP") {
             // TODO why GROUP no need shadow ?
-            return this;
+            return ;
         }
 
         const shadow = lvgluiShadow(node);
         if (shadow) {
             this.pushModifier(...shadow);
         }
-        
-        return this;   
     }
 
-    private layoutPadding(node: SceneNode, optimizeLayout: boolean = true): this {
+    protected layoutPadding(node: SceneNode, optimizeLayout: boolean = true) {
         if ("paddingLeft" in node) {
             const result = lvgluiPadding(
                 (optimizeLayout ? node.inferredAutoLayout : null) ?? node
@@ -107,6 +104,5 @@ export class LvglUIStyle implements IStyle {
                 this.pushModifier(...result);
             }
         }
-        return this;
       }
 }

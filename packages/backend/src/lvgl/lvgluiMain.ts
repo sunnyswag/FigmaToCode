@@ -4,7 +4,7 @@ import { LvgluiTextBuilder } from "./lvgluiTextBuilder";
 import { LvgluiDefaultBuilder } from "./lvgluiDefaultBuilder";
 import { PluginSettings } from "../code";
 import { commonSortChildrenWhenInferredAutoLayout } from "../common/commonChildrenOrder";
-import { LvglUIStyle } from "./builderImpl/style/lvgluiStyle";
+import { clearCachedUIModifier } from "./builderImpl/style/styleUtils";
 
 let localSettings: PluginSettings;
 
@@ -20,7 +20,7 @@ export const lvgluiMain = (
   settings: PluginSettings
 ): string => {
   localSettings = settings;
-  LvglUIStyle.clearCachedUIModifier();
+  clearCachedUIModifier();
   let result = lvgluiWidgetGenerator(sceneNode, 0);
 
   switch (localSettings.lvglUIGenerationMode) {
