@@ -84,9 +84,13 @@ export class LvgluiDefaultBuilder {
   }
 
   private addStyle(node: SceneNode) {
-    const styleIndex = getStyleIndex(LvglUIStyle.construct(node));
+    const styleIndex = getStyleIndex(this.constructStyle(node));
     if (styleIndex != -1)
       this.pushModifier(["add_style", `&style${styleIndex}, 0`])
+  }
+
+  protected constructStyle(node: SceneNode): LvglUIStyle {
+    return LvglUIStyle.construct(node)
   }
 
   protected pushModifier(...args: (Modifier | [string | null, string | null] | null)[]) {

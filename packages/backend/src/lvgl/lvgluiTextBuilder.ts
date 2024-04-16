@@ -1,4 +1,5 @@
 import { globalTextStyleSegments } from "../altNodes/altConversion";
+import { LVglUITextStyle } from "./builderImpl/style/lvgluiTextStyle";
 import { LvgluiDefaultBuilder } from "./lvgluiDefaultBuilder";
 
 export class LvgluiTextBuilder extends LvgluiDefaultBuilder {
@@ -10,6 +11,10 @@ export class LvgluiTextBuilder extends LvgluiDefaultBuilder {
 
   protected createNode(): void {
     this.pushModifier([`lv_obj_t *${this.currentNodeName} = lv_label_create`, `${this.parentNodeName}`])
+  }
+
+  protected constructStyle(node: SceneNode & LayoutMixin & MinimalBlendMixin & TextNode): LVglUITextStyle {
+    return LVglUITextStyle.construct(node)
   }
 
   private setText = (node: TextNode) => {
