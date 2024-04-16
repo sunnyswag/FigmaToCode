@@ -38,11 +38,15 @@ export class LvgluiDefaultBuilder {
 
   toString(): string {
     return this.modifiers.map(([operation, parameter]) => {
-      // TODO fix ", "
-      const param = parameter ? `, ${parameter}` : "";
-      const prefix = operation.match("lv") == null ? this.prefix : "";
-      const currentNodeName = operation.match("create") == null ? this.currentNodeName : "";
-      return `${prefix}${operation}(${currentNodeName}${param});`;
+      // compatible the lv_label_set_text() logic
+      const prefix = /obj/.test(operation) ? "" : this.prefix;
+      // compatible the lv_obj_create() logic, lv_obj_create() func no need this.currentNodeName
+      const currentNodeName = /create/.test(operation) ? "" : this.currentNodeName;
+
+      let result = `${prefix}${operation}(${currentNodeName}, ${parameter});`;
+      if (/, \)/.test(result) || /\(, /.test(result))
+        result = result.replace(/, /g, "");
+      return result;
     }).join("\n") + "\n";
   }
 
