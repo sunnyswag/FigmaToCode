@@ -62,12 +62,15 @@ export class LvgluiDefaultBuilder {
 
   private position(node: SceneNode, optimizeLayout: boolean) {
     if (commonIsAbsolutePosition(node, optimizeLayout)) {
-      const { x, y } = getCommonPositionValue(node);
+      let { x, y } = getCommonPositionValue(node);
+      x = Math.round(x);
+      y = Math.round(y);
 
-      this.pushModifier([
-        `align`,
-        `${this.parentNodeName}, ${Math.round(x)}, ${Math.round(y)}`,
-      ]);
+      if (x != 0 && y != 0)
+        this.pushModifier([
+          `align`,
+          `${this.parentNodeName}, ${x}, ${y}`,
+        ]);
     }
   }
 
