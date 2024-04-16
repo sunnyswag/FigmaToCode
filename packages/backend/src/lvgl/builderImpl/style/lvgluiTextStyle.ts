@@ -17,6 +17,8 @@ export class LVglUITextStyle extends LvglUIStyle {
         return instance;
     }
 
+    shapeBackground(node: SceneNode) {}
+
     private constructTextUIStyle(node: TextNode, segment: StyledTextSegment) {
         this.textColor(segment);
         this.textDecoration(segment);
