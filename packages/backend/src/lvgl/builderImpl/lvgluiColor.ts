@@ -1,7 +1,7 @@
 import { retrieveTopFill } from "../../common/retrieveFill";
 import { gradientAngle } from "../../common/color";
 import { nearestValue } from "../../tailwind/conversionTables";
-import { formatOpacity } from "./lvgluiBlend";
+import { formatOpacity, numFormat } from "./lvgluiBlend";
 import { Modifier } from "./style/styleUtils";
 
 export type LvglColor = {
@@ -99,6 +99,6 @@ export const lvgluiRGBAColor = (color: RGBA) => lvgluiColor(color, color.a);
 export const lvgluiColor = (color: RGB, opacity: number | undefined): LvglColor => {
   return {
     opacity: formatOpacity(opacity ?? 1.0),
-    color: `lv_color_make(${color.r}, ${color.g}, ${color.b})`
+    color: `lv_color_make(${numFormat(color.r)}, ${numFormat(color.g)}, ${numFormat(color.b)})`
   };
 };

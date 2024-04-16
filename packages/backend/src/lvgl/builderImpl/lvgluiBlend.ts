@@ -13,7 +13,7 @@ export const lvgluiOpacity = (node: MinimalBlendMixin): Modifier | null => {
 };
 
 export const formatOpacity = (opacity: number): number | null => {
-  const result = Math.max(0, Math.min(255, Math.round(opacity * 255)));
+  const result = numFormat(opacity);
   return result == 255 ? null : result;
 }
 
@@ -42,3 +42,7 @@ export const blendModeEnum = (node: MinimalBlendMixin): string => {
       return "";
   }
 };
+
+export const numFormat = (source: number): number => {
+  return Math.max(0, Math.min(255, Math.round(source * 255)));
+}
