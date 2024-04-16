@@ -2,8 +2,8 @@ import { lvgluiPadding } from "../lvgluiPadding";
 import { lvgluiShadow } from "../lvgluiEffects";
 import { blendModeEnum } from "../lvgluiBlend";
 import {
-  lvgluiBorder,
-  lvgluiCornerRadius,
+    lvgluiBorder,
+    lvgluiCornerRadius,
 } from "../lvgluiBorder";
 import { lvgluiBackground } from "../lvgluiColor";
 import { Modifier, pushModifier } from "./styleUtils";
@@ -20,19 +20,20 @@ export class LvglUIStyle implements IStyle {
     }
 
     toString(index: number): string {
-        return this.currentStyle.map(([operation, parameter]) => {
-            const param = parameter ? `, ${parameter}` : "";
-            return `${this.prefix}${operation}(style${index}${param});`;
-        }).join("\n");
+        return this.initStyle(index)
+            + this.currentStyle.map(([operation, parameter]) => {
+                const param = parameter ? `, ${parameter}` : "";
+                return `${this.prefix}${operation}(style${index}${param});`;
+            }).join("\n");
     }
 
     equals(other: LvglUIStyle): boolean {
         if (this.currentStyle.length != other.currentStyle.length) {
             return false;
         }
-        
+
         for (let i = 0; i < this.currentStyle.length; i++) {
-            if (this.currentStyle[i][0] != other.currentStyle[i][0] 
+            if (this.currentStyle[i][0] != other.currentStyle[i][0]
                 || this.currentStyle[i][1] != other.currentStyle[i][1]
             ) return false;
         }
@@ -51,7 +52,7 @@ export class LvglUIStyle implements IStyle {
         this.layoutPadding(node);
     }
 
-    protected pushModifier(...args: (Modifier | [string | null, string | null]| null)[]) {
+    protected pushModifier(...args: (Modifier | [string | null, string | null] | null)[]) {
         pushModifier(this.currentStyle, ...args);
     }
 
@@ -60,7 +61,7 @@ export class LvglUIStyle implements IStyle {
         if (borders) {
             this.pushModifier(...borders);
         }
-      }
+    }
 
     protected lvgluiBlendMode(node: MinimalBlendMixin) {
         const fromBlendEnum = blendModeEnum(node);
@@ -68,7 +69,7 @@ export class LvglUIStyle implements IStyle {
             this.pushModifier(["blend_mode", fromBlendEnum]);
         }
     }
-    
+
     protected shapeBackground(node: SceneNode) {
         if ("fills" in node) {
             const background = lvgluiBackground(node.fills);
@@ -77,17 +78,17 @@ export class LvglUIStyle implements IStyle {
             }
         }
     }
-    
+
     protected cornerRadius(node: SceneNode) {
         const corner = lvgluiCornerRadius(node);
         if (corner) {
             this.pushModifier([`radius`, corner]);
         }
     }
-    
+
     protected effects(node: SceneNode) {
         if (node.type === "GROUP") {
-            return ;
+            return;
         }
 
         const shadow = lvgluiShadow(node);
@@ -105,5 +106,10 @@ export class LvglUIStyle implements IStyle {
                 this.pushModifier(...result);
             }
         }
-      }
+    }
+
+    private initStyle(index: number): string {
+        return `static lv_style_t style${index};\n` +
+            `lv_style_init(&style${index});\n`
+    }
 }
