@@ -12,7 +12,6 @@ export class LvgluiTextBuilder extends LvgluiDefaultBuilder {
   }
 
   private setText = (node: TextNode) => {
-    // TODO consider move to text builder
     let updatedText = node.characters;
     const textCase = node.getStyledTextSegments(["textCase"])[0].textCase;
     if (textCase === "LOWER") {

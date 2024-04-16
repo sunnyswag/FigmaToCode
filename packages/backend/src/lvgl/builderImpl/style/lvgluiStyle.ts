@@ -87,7 +87,6 @@ export class LvglUIStyle implements IStyle {
     
     protected effects(node: SceneNode) {
         if (node.type === "GROUP") {
-            // TODO why GROUP no need shadow ?
             return ;
         }
 
