@@ -16,8 +16,9 @@ export const resetNodeIndex = () => { nodeIndex = 0 };
 export class LvgluiDefaultBuilder {
   currentNodeName = `obj${nodeIndex}`;
   protected parentNodeName: string;
-  private readonly prefix = "lv_obj_"
+  protected readonly defPrefix = "lv_obj_"
   private modifiers: Modifier[] = []
+  private subModifiers: Modifier[] = []
 
   constructor(parentNodeName: string = "lv_screen_active()") {
     this.parentNodeName = parentNodeName;
@@ -25,7 +26,6 @@ export class LvgluiDefaultBuilder {
   }
 
   buildModifier(node: SceneNode, optimizeLayout: boolean) {
-    this.createNode();
     this.position(node, optimizeLayout);
     if ("layoutAlign" in node && "opacity" in node) {
       this.opacity(node);
@@ -36,17 +36,20 @@ export class LvgluiDefaultBuilder {
   }
 
   toString(): string {
-    return this.modifiers.map(([operation, parameter]) => {
-      // compatible the lv_label_set_text() logic
-      const prefix = /obj/.test(operation) ? "" : this.prefix;
-      // compatible the lv_obj_create() logic, lv_obj_create() func no need this.currentNodeName
-      const currentNodeName = /create/.test(operation) ? "" : this.currentNodeName;
+    const getModifiersStr = (modifiers: Modifier[], prefix: string) => {
+      return modifiers.map(([operation, parameter]) => {
+        let result = `${prefix}${operation}(${this.currentNodeName}, ${parameter});`;
+        if (/, \)/.test(result) || /\(, /.test(result))
+          result = result.replace(/, /g, "");
+        return result;
+      });
+    }
 
-      let result = `${prefix}${operation}(${currentNodeName}, ${parameter});`;
-      if (/, \)/.test(result) || /\(, /.test(result))
-        result = result.replace(/, /g, "");
-      return result;
-    }).join("\n") + "\n";
+    const result: string[] = [];
+    result.push(this.createNodeStr());
+    result.push(...getModifiersStr(this.modifiers, this.defPrefix));
+    result.push(...getModifiersStr(this.subModifiers, ""));
+    return result.join("\n") + "\n";
   }
 
   private opacity(node: SceneNode & LayoutMixin & MinimalBlendMixin): this {
@@ -87,15 +90,19 @@ export class LvgluiDefaultBuilder {
       this.pushModifier(["add_style", `&style${styleIndex}, 0`])
   }
 
+  private pushModifier(...args: (Modifier | [string | null, string | null] | null)[]) {
+    pushModifier(this.modifiers, ...args);
+  }
+  
   protected constructStyle(node: SceneNode): LvglUIStyle {
     return LvglUIStyle.construct(node)
   }
 
-  protected pushModifier(...args: (Modifier | [string | null, string | null] | null)[]) {
-    pushModifier(this.modifiers, ...args);
+  protected pushSubModifier(...args: (Modifier | [string | null, string | null] | null)[]) {
+    pushModifier(this.subModifiers, ...args);
   }
 
-  protected createNode() {
-    this.pushModifier([`lv_obj_t *${this.currentNodeName} = lv_obj_create`, `${this.parentNodeName}`])
+  protected createNodeStr(): string {
+    return `lv_obj_t *${this.currentNodeName} = lv_obj_create(${this.parentNodeName});`;
   }
 }

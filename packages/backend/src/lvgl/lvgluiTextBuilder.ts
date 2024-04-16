@@ -9,8 +9,8 @@ export class LvgluiTextBuilder extends LvgluiDefaultBuilder {
       this.setText(node as TextNode);
   }
 
-  protected createNode(): void {
-    this.pushModifier([`lv_obj_t *${this.currentNodeName} = lv_label_create`, `${this.parentNodeName}`])
+  protected createNodeStr(): string {
+    return `lv_obj_t *${this.currentNodeName} = lv_label_create(${this.parentNodeName});`;
   }
 
   protected constructStyle(node: SceneNode & LayoutMixin & MinimalBlendMixin & TextNode): LVglUITextStyle {
@@ -25,6 +25,6 @@ export class LvgluiTextBuilder extends LvgluiDefaultBuilder {
     } else if (textCase === "UPPER") {
         updatedText = node.characters.toUpperCase();
     }
-    this.pushModifier([`lv_label_set_text`, `"${updatedText}"`]);
+    this.pushSubModifier([`lv_label_set_text`, `"${updatedText}"`]);
   }
 }
