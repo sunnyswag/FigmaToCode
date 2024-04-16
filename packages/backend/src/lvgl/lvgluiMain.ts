@@ -36,8 +36,8 @@ export const lvgluiMain = (
   if (result.length > 0 && result.startsWith("\n")) {
     result = result.slice(1, result.length);
   }
-
-  return result;
+  
+  return indentString(result, 4);
 };
 
 const lvgluiWidgetGenerator = (

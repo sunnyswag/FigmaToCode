@@ -23,7 +23,7 @@ export class LvglUIStyle implements IStyle {
         return this.currentStyle.length != 0 ? this.initStyle(index)
             + this.currentStyle.map(([operation, parameter]) => {
                 const param = parameter ? `, ${parameter}` : "";
-                return `${this.prefix}${operation}(style${index}${param});`;
+                return `${this.prefix}${operation}(&style${index}${param});`;
             }).join("\n") : "";
     }
 
