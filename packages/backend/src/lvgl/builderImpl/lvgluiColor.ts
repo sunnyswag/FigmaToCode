@@ -60,7 +60,7 @@ const lvglCommonColorLogic = (
     return lvgluiGradient(prefix, fill);
   } else if (fill?.type === "IMAGE") {
     return [
-      [`${prefix}image_src`, "image_name"]
+      [`${prefix}image_src`, `"image_name"`]
     ];
   }
 

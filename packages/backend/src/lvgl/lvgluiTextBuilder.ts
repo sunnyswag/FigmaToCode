@@ -1,3 +1,4 @@
+import { globalTextStyleSegments } from "../altNodes/altConversion";
 import { LvgluiDefaultBuilder } from "./lvgluiDefaultBuilder";
 
 export class LvgluiTextBuilder extends LvgluiDefaultBuilder {
@@ -13,12 +14,12 @@ export class LvgluiTextBuilder extends LvgluiDefaultBuilder {
 
   private setText = (node: TextNode) => {
     let updatedText = node.characters;
-    const textCase = node.getStyledTextSegments(["textCase"])[0].textCase;
+    const textCase = globalTextStyleSegments[node.id][0].textCase;
     if (textCase === "LOWER") {
         updatedText = node.characters.toLowerCase();
     } else if (textCase === "UPPER") {
         updatedText = node.characters.toUpperCase();
     }
-    this.pushModifier([`lv_label_set_text`, updatedText]);
+    this.pushModifier([`lv_label_set_text`, `"${updatedText}"`]);
   }
 }
