@@ -5,7 +5,7 @@ import { formatOpacity, numFormat } from "./lvgluiBlend";
 import { Modifier } from "./style/styleUtils";
 
 export type LvglColor = {
-  opacity: number,
+  opacity: string,
   color: string
 }
 

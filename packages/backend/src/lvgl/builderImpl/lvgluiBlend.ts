@@ -1,17 +1,32 @@
 import { Modifier } from "./style/styleUtils";
 
-/**
- * https://developer.apple.com/documentation/lvglui/view/opacity(_:)
- */
-export const lvgluiOpacity = (node: MinimalBlendMixin): Modifier | null => {
-  if (node.opacity !== undefined && node.opacity !== 1) {
-    return ["set_style_opa", formatOpacity(node.opacity)];
-  }
-  return null;
-};
-
-export const formatOpacity = (opacity: number): number => {
-  return numFormat(opacity * 255);
+export const formatOpacity = (opacity: number): string => {
+  switch (numFormat(opacity)) {
+    case 0:
+      return "LV_OPA_TRANSP";
+    case 25:
+      return "LV_OPA_10";
+    case 51:
+      return "LV_OPA_20";
+    case 76:
+      return "LV_OPA_30";
+    case 102:
+      return "LV_OPA_40";
+    case 127:
+      return "LV_OPA_50";
+    case 153:
+      return "LV_OPA_60";
+    case 178:
+      return "LV_OPA_70";
+    case 204:
+      return "LV_OPA_80";
+    case 229:
+      return "LV_OPA_90";
+    case 255:
+      return "LV_OPA_COVER";
+    default:
+      return numFormat(opacity).toString();
+  };
 }
 
 export const lvgluiVisibility = (node: SceneNodeMixin): Modifier | null => {
@@ -29,7 +44,6 @@ export const lvgluiRotation = (node: LayoutMixin): Modifier | null => {
 export const blendModeEnum = (node: MinimalBlendMixin): string => {
   switch (node.blendMode) {
     case "DIFFERENCE":
-      return "LV_BLEND_MODE_SUBTRACTIVE";
     case "EXCLUSION":
       return "LV_BLEND_MODE_SUBTRACTIVE";
     case "MULTIPLY":
