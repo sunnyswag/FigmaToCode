@@ -26,13 +26,13 @@ export class LvgluiDefaultBuilder {
   }
 
   buildModifier(node: SceneNode, optimizeLayout: boolean) {
+    this.removeDefalutStyle();
+    this.addStyle(node);
     this.position(node, optimizeLayout);
     if ("layoutAlign" in node && "opacity" in node) {
       this.opacity(node);
     }
     this.size(node, optimizeLayout);
-    this.removeDefalutStyle();
-    this.addStyle(node);
   }
 
   toString(): string {
