@@ -20,11 +20,11 @@ export class LvglUIStyle implements IStyle {
     }
 
     toString(index: number): string {
-        return this.initStyle(index)
+        return this.currentStyle.length != 0 ? this.initStyle(index)
             + this.currentStyle.map(([operation, parameter]) => {
                 const param = parameter ? `, ${parameter}` : "";
                 return `${this.prefix}${operation}(style${index}${param});`;
-            }).join("\n");
+            }).join("\n") : "";
     }
 
     equals(other: LvglUIStyle): boolean {

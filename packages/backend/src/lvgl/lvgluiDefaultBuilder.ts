@@ -82,7 +82,8 @@ export class LvgluiDefaultBuilder {
 
   private addStyle(node: SceneNode) {
     const styleIndex = getStyleIndex(LvglUIStyle.construct(node));
-    this.pushModifier(["add_style", `&style${styleIndex}, 0`])
+    if (styleIndex != -1)
+      this.pushModifier(["add_style", `&style${styleIndex}, 0`])
   }
 
   protected pushModifier(...args: (Modifier | [string | null, string | null] | null)[]) {

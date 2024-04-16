@@ -16,8 +16,12 @@ export const getStyleIndex = (iStyle: IStyle): number => {
     if (index != -1) {
         return index;
     } else {
-        styleCache.push(iStyle);
-        return styleCache.length - 1;
+        if (iStyle.toString(0) != "") {
+            styleCache.push(iStyle);
+            return styleCache.length - 1;
+        } else {
+            return -1;
+        }
     }
 }
 
