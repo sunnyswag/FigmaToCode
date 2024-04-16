@@ -5,7 +5,7 @@ import { formatOpacity, numFormat } from "./lvgluiBlend";
 import { Modifier } from "./style/styleUtils";
 
 export type LvglColor = {
-  opacity: number | null,
+  opacity: number,
   color: string
 }
 
@@ -46,16 +46,10 @@ const lvglCommonColorLogic = (
 
   if (fill && fill.type === "SOLID") {
     const item = lvgluiColor(fill.color, fill.opacity);
-    if (item.opacity) {
-      return [
-        [`${prefix}color`, item.color],
-        [`${prefix}opa`, item.opacity]
-      ];
-    } else {
-      return [
-        [`${prefix}color`, item.color]
-      ];
-    }
+    return [
+      [`${prefix}color`, item.color],
+      [`${prefix}opa`, item.opacity]
+    ];
   } else if (fill?.type === "GRADIENT_LINEAR") {
     return lvgluiGradient(prefix, fill);
   } else if (fill?.type === "IMAGE") {
@@ -76,8 +70,7 @@ const lvgluiGradient = (prefix: string, fill: GradientPaint): Modifier[] => {
   const lastGradientStop = fill.gradientStops[fill.gradientStops.length - 1];
   const gradientColor = lvgluiRGBAColor(lastGradientStop.color);
   result.push([`${prefix}grad_color`, gradientColor.color]);
-  if (gradientColor.opacity)
-    result.push([`${prefix}grad_opa`, gradientColor.opacity]);
+  result.push([`${prefix}grad_opa`, gradientColor.opacity]);
 
   return result;
 };

@@ -4,17 +4,14 @@ import { Modifier } from "./style/styleUtils";
  * https://developer.apple.com/documentation/lvglui/view/opacity(_:)
  */
 export const lvgluiOpacity = (node: MinimalBlendMixin): Modifier | null => {
-  if (node.opacity !== undefined) {
-    const opacity = formatOpacity(node.opacity);
-    if (opacity != null)
-      return ["set_style_opa", opacity];
+  if (node.opacity !== undefined && node.opacity !== 1) {
+    return ["set_style_opa", formatOpacity(node.opacity)];
   }
   return null;
 };
 
-export const formatOpacity = (opacity: number): number | null => {
-  const result = numFormat(opacity);
-  return result == 255 ? null : result;
+export const formatOpacity = (opacity: number): number => {
+  return numFormat(opacity * 255);
 }
 
 export const lvgluiVisibility = (node: SceneNodeMixin): Modifier | null => {
