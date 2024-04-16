@@ -47,13 +47,13 @@ const lvgluiWidgetGenerator = (
   // filter non visible nodes. This is necessary at this step because conversion already happened.
   const visibleSceneNode = sceneNode.filter((d) => d.visible);
   let comp: string[] = [];
-
+  
   visibleSceneNode.forEach((node) => {
     switch (node.type) {
       case "RECTANGLE":
       case "ELLIPSE":
       case "LINE":
-        comp.push(lvgluiContainer(node, parentNodeName));
+        comp.push(lvgluiContainer(node, parentNodeName)?.toString() ?? "");
         break;
       case "GROUP":
       case "SECTION":
@@ -81,27 +81,28 @@ const lvgluiWidgetGenerator = (
 export const lvgluiContainer = (
   node: SceneNode,
   parentNodeName: string,
-  stack: string = ""
-): string => {
+): LvgluiDefaultBuilder | null => {
   // ignore the view when size is zero or less
   // while technically it shouldn't get less than 0, due to rounding errors,
   // it can get to values like: -0.000004196293048153166
   if (node.width < 0 || node.height < 0) {
-    return stack;
+    return null;
   }
   
   const result = new LvgluiDefaultBuilder(parentNodeName);
   result.buildModifier(node, localSettings.optimizeLayout);
 
-  return `${result.toString()}${stack}`;
+  return result;
 };
 
 const lvgluiGroup = (
   node: GroupNode | SectionNode,
   parentNodeName: string,
 ): string => {
-  const children = widgetGeneratorWithLimits(node, parentNodeName);
-  return lvgluiContainer(node, parentNodeName, children);
+  const currentNode = lvgluiContainer(node, parentNodeName);
+  
+  const children = widgetGeneratorWithLimits(node, currentNode?.currentNodeName ?? parentNodeName);
+  return (currentNode?.toString() ?? "") + children;
 };
 
 const lvgluiText = (node: TextNode, parentNodeName: string): string => {
@@ -115,11 +116,10 @@ const lvgluiFrame = (
   node: SceneNode & BaseFrameMixin,
   parentNodeName: string
 ): string => {
-  const children = widgetGeneratorWithLimits(node, parentNodeName);
+  const currentNode = lvgluiContainer(node, parentNodeName);  
 
-  const parentNode = new LvgluiDefaultBuilder(parentNodeName);
-  parentNode.buildModifier(node, localSettings.optimizeLayout);
-  return lvgluiContainer(node, parentNode.currentNodeName, children);
+  const children = widgetGeneratorWithLimits(node, currentNode?.currentNodeName ?? parentNodeName);
+  return (currentNode?.toString() ?? "") + children;
 };
 
 const widgetGeneratorWithLimits = (
