@@ -22,7 +22,7 @@ export class LvglUIStyle implements IStyle {
     toString(index: number): string {
         return this.currentStyle.length != 0 ? this.initStyle(index)
             + this.currentStyle.map(([operation, parameter]) => {
-                const param = parameter ? `, ${parameter}` : "";
+                const param = parameter.toString() ? `, ${parameter}` : "";
                 return `${this.prefix}${operation}(&style${index}${param});`;
             }).join("\n") : "";
     }
@@ -111,8 +111,11 @@ export class LvglUIStyle implements IStyle {
 
     private rotation(node: SceneNode & LayoutMixin) {
         const rotation = lvgluiRotation(node)
-        if (rotation)
+        if (rotation) {
+            console.log("rotation: ", rotation);
             this.pushModifier(...rotation);
+        }
+            
     }
 
     private initStyle(index: number): string {
