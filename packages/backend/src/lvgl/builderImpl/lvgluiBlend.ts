@@ -1,3 +1,4 @@
+import { getCommonCenterXY } from "../../common/commonPosition";
 import { Modifier } from "./style/styleUtils";
 
 export const formatOpacity = (opacity: number): string => {
@@ -37,8 +38,16 @@ export const lvgluiVisibility = (node: SceneNodeMixin): Modifier | null => {
   return null;
 };
 
-export const lvgluiRotation = (node: LayoutMixin): Modifier | null => {
-  return null;
+export const lvgluiRotation = (node: LayoutMixin & SceneNode): Modifier[] | null => {
+  const rotation = Math.round(node.rotation);
+  if (rotation == 0) return null;
+  
+  const {centerX, centerY} = getCommonCenterXY(node)
+  return [
+    ["transform_rotation", -Math.round(rotation * 10)],
+    ["transform_pivot_x", Math.round(centerX)],
+    ["transform_pivot_y", Math.round(centerY)]
+  ];
 };
 
 export const blendModeEnum = (node: MinimalBlendMixin): string => {

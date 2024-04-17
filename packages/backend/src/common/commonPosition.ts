@@ -120,6 +120,20 @@ export const getCommonPositionValue = (
   };
 };
 
+export const getCommonCenterXY = (
+  node: SceneNode
+): { centerX: number, centerY: number } => {
+  if (!node.parent || !("width" in node.parent)) {
+    return { centerX: node.width / 2, centerY: node.height / 2 };
+  }
+  
+  const {x, y} = getCommonPositionValue(node);
+  return {
+    centerX: x + node.width / 2,
+    centerY: y + node.height / 2
+  }
+}
+
 export const commonIsAbsolutePosition = (
   node: SceneNode,
   optimizeLayout: boolean

@@ -1,7 +1,6 @@
 import { lvgluiSize } from "./builderImpl/lvgluiSize";
 import {
-  lvgluiVisibility,
-  lvgluiRotation,
+  lvgluiVisibility
 } from "./builderImpl/lvgluiBlend";
 import {
   commonIsAbsolutePosition,
@@ -54,8 +53,7 @@ export class LvgluiDefaultBuilder {
 
   private opacity(node: SceneNode & LayoutMixin & MinimalBlendMixin): this {
     this.pushModifier(
-      lvgluiVisibility(node),
-      lvgluiRotation(node)
+      lvgluiVisibility(node)
     );
 
     return this;

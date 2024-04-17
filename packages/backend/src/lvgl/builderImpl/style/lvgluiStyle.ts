@@ -1,6 +1,6 @@
 import { lvgluiPadding } from "../lvgluiPadding";
 import { lvgluiShadow } from "../lvgluiEffects";
-import { blendModeEnum } from "../lvgluiBlend";
+import { blendModeEnum, lvgluiRotation } from "../lvgluiBlend";
 import {
     lvgluiBorder,
     lvgluiCornerRadius,
@@ -45,6 +45,7 @@ export class LvglUIStyle implements IStyle {
         this.shapeBorder(node);
         if ("layoutAlign" in node && "opacity" in node) {
             this.lvgluiBlendMode(node);
+            this.rotation(node);
         }
         this.shapeBackground(node);
         this.cornerRadius(node);
@@ -106,6 +107,12 @@ export class LvglUIStyle implements IStyle {
                 this.pushModifier(...result);
             }
         }
+    }
+
+    private rotation(node: SceneNode & LayoutMixin) {
+        const rotation = lvgluiRotation(node)
+        if (rotation)
+            this.pushModifier(...rotation);
     }
 
     private initStyle(index: number): string {
