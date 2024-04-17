@@ -31,13 +31,8 @@ export const lvgluiMain = (
       // result = generateWidgetCode("Column", { children: [result] });
       return getPreviewTemplate(result);
   }
-
-  // remove the initial \n that is made in Container.
-  if (result.length > 0 && result.startsWith("\n")) {
-    result = result.slice(1, result.length);
-  }
   
-  return indentString(result, 4);
+  return indentString(result.trim(), 4);
 };
 
 const lvgluiWidgetGenerator = (
@@ -73,7 +68,7 @@ const lvgluiWidgetGenerator = (
     }
   });
 
-  return comp.join("\n");
+  return comp.join("");
 };
 
 // properties named propSomething always take care of ","
@@ -155,7 +150,7 @@ const widgetGeneratorWithLimits = (
   for (let i = 0, j = slicedChildren.length; i < j; i += chunk) {
     const chunkChildren = slicedChildren.slice(i, i + chunk);
     const strChildren = lvgluiWidgetGenerator(chunkChildren, parentNodeName);
-    strBuilder += `${strChildren}\n\n`;
+    strBuilder += strChildren;
   }
 
   return strBuilder;

@@ -49,7 +49,7 @@ export class LvgluiDefaultBuilder {
     result.push(this.createNodeStr());
     result.push(...getModifiersStr(this.modifiers, this.defPrefix));
     result.push(...getModifiersStr(this.subModifiers, ""));
-    return result.join("\n") + "\n";
+    return result.join("\n") + "\n\n";
   }
 
   private opacity(node: SceneNode & LayoutMixin & MinimalBlendMixin): this {
