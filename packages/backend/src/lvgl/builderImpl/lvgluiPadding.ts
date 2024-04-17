@@ -15,26 +15,26 @@ export const lvgluiPadding = (
 
   const result: Modifier[] = [];
   if ("all" in padding) {
-    pushPadding(result, padding.all, "all")
+    pushPadding(result, "all", padding.all)
     return result;
   }
   
   if ("horizontal" in padding) {
-    pushPadding(result, padding.horizontal, "hor");
-    pushPadding(result, padding.vertical, "ver");
+    pushPadding(result, "hor", padding.horizontal);
+    pushPadding(result, "ver", padding.vertical);
     return result;
   }
 
-  pushPadding(result, padding.top, "top");
-  pushPadding(result, padding.left, "left");
-  pushPadding(result, padding.bottom, "bottom");
-  pushPadding(result, padding.right, "right");
+  pushPadding(result, "top", padding.top);
+  pushPadding(result, "left", padding.left);
+  pushPadding(result, "bottom", padding.bottom);
+  pushPadding(result, "right", padding.right);
 
   return result;
 };
 
-const pushPadding = (result: Modifier[], padding: number, operationName: string): void => {
-  if (padding === 0) {
+const pushPadding = (result: Modifier[], operationName: string, padding: number): void => {
+  if (Math.round(padding) != 0) {
     result.push([`pad_${operationName}`, Math.round(padding)])
   }
 }
