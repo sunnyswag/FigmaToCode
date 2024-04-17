@@ -29,7 +29,7 @@ export class LvgluiDefaultBuilder {
     this.addStyle(node);
     this.position(node, optimizeLayout);
     if ("layoutAlign" in node && "opacity" in node) {
-      this.opacity(node);
+      this.pushModifier(lvgluiVisibility(node));
     }
     this.size(node, optimizeLayout);
   }
@@ -49,14 +49,6 @@ export class LvgluiDefaultBuilder {
     result.push(...getModifiersStr(this.modifiers, this.defPrefix));
     result.push(...getModifiersStr(this.subModifiers, ""));
     return result.join("\n") + "\n\n";
-  }
-
-  private opacity(node: SceneNode & LayoutMixin & MinimalBlendMixin): this {
-    this.pushModifier(
-      lvgluiVisibility(node)
-    );
-
-    return this;
   }
 
   private position(node: SceneNode, optimizeLayout: boolean) {
