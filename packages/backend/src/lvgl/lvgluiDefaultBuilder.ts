@@ -3,8 +3,7 @@ import {
   lvgluiVisibility
 } from "./builderImpl/lvgluiBlend";
 import {
-  commonIsAbsolutePosition,
-  getCommonPositionValue,
+  getCommonPositionValue
 } from "../common/commonPosition";
 import { Modifier, getStyleIndex, pushModifier } from "./builderImpl/style/styleUtils";
 import { LvglUIStyle } from "./builderImpl/style/lvgluiStyle";
@@ -52,7 +51,6 @@ export class LvgluiDefaultBuilder {
   }
 
   private position(node: SceneNode, optimizeLayout: boolean) {
-    if (commonIsAbsolutePosition(node, optimizeLayout)) {
       let { x, y } = getCommonPositionValue(node);
       x = Math.round(x);
       y = Math.round(y);
@@ -61,7 +59,6 @@ export class LvgluiDefaultBuilder {
         `align`,
         `${this.parentNodeName}, ${x}, ${y}`,
       ]);
-    }
   }
 
   private size(node: SceneNode, optimize: boolean) {

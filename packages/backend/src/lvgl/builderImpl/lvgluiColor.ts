@@ -62,15 +62,19 @@ const lvglCommonColorLogic = (
 }
 
 const lvgluiGradient = (prefix: string, fill: GradientPaint): Modifier[] => {
+  const addColor = (index: number, subPrefix: string, result: Modifier[]) => {
+    const gradColor = lvgluiRGBAColor(fill.gradientStops[index].color);
+    result.push([`${prefix}${subPrefix}color`, gradColor.color]);
+    result.push([`${prefix}${subPrefix}opa`, gradColor.opacity]);
+  }
+
   const result: Modifier[] = [];
 
   const direction = gradientDirection(gradientAngle(fill));
   result.push([`${prefix}grad_dir`, direction]);
 
-  const lastGradientStop = fill.gradientStops[fill.gradientStops.length - 1];
-  const gradientColor = lvgluiRGBAColor(lastGradientStop.color);
-  result.push([`${prefix}grad_color`, gradientColor.color]);
-  result.push([`${prefix}grad_opa`, gradientColor.opacity]);
+  addColor(0, "", result);
+  addColor(fill.gradientStops.length - 1, "grad_", result);
 
   return result;
 };
