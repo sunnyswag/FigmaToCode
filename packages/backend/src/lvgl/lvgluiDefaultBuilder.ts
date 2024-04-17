@@ -67,11 +67,10 @@ export class LvgluiDefaultBuilder {
       x = Math.round(x);
       y = Math.round(y);
 
-      if (x != 0 && y != 0)
-        this.pushModifier([
-          `align`,
-          `${this.parentNodeName}, ${x}, ${y}`,
-        ]);
+      this.pushModifier([
+        `align`,
+        `${this.parentNodeName}, ${x}, ${y}`,
+      ]);
     }
   }
 
