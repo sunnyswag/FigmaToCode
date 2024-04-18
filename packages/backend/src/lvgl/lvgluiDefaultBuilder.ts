@@ -8,6 +8,7 @@ import {
 } from "../common/commonPosition";
 import { Modifier, getStyleIndex, pushModifier } from "./builderImpl/style/styleUtils";
 import { LvglUIStyle } from "./builderImpl/style/lvgluiStyle";
+import { getRawPadding } from "../common/commonPadding";
 
 let nodeIndex: number = 0
 export const resetNodeIndex = () => { nodeIndex = 0 };
@@ -52,17 +53,24 @@ export class LvgluiDefaultBuilder {
   }
 
   private position(node: SceneNode, optimizeLayout: boolean) {
-    // if (commonIsAbsolutePosition(node, optimizeLayout)) {
-      // TODO 
-      let { x, y } = getCommonPositionValue(node);
-      x = Math.round(x);
-      y = Math.round(y);
+    if (this.currentNodeName == "obj0") return;
+    
+    let paddingTop = 0;
+    let paddingLeft = 0;
+    if ("paddingLeft" in node) {
+      const rawPad = getRawPadding(node);
+      paddingLeft = rawPad.left;
+      paddingTop = rawPad.top; 
+    }
 
-      this.pushModifier([
-        `align`,
-        `${this.parentNodeName}, ${x}, ${y}`,
-      ]);
-    // }
+    let { x, y } = getCommonPositionValue(node);
+    x = Math.round(x) - paddingLeft; 
+    y = Math.round(y) - paddingTop;
+
+    this.pushModifier([
+      `align`,
+      `${this.parentNodeName}, ${x}, ${y}`,
+    ]);
   }
 
   private size(node: SceneNode, optimize: boolean) {

@@ -16,7 +16,7 @@ export const getRawPadding = (node: InferredAutoLayoutResult): {
   right: number;
   top: number;
   bottom: number;
-} | null => {
+} => {
   if ("layoutMode" in node && node.layoutMode !== "NONE") {
     return {
       left: parseFloat((node.paddingLeft ?? 0).toFixed(2)),
@@ -25,7 +25,7 @@ export const getRawPadding = (node: InferredAutoLayoutResult): {
       bottom: parseFloat((node.paddingBottom ?? 0).toFixed(2))
     }
   } else {
-    return null;
+    return {left: 0, right: 0, top: 0, bottom: 0};
   }
 }
 
@@ -33,27 +33,28 @@ export const commonPadding = (
   node: InferredAutoLayoutResult
 ): PaddingType | null => {
   const padRaw = getRawPadding(node);
-  if (padRaw) {
-    if (
-      padRaw.left === padRaw.right &&
-      padRaw.left === padRaw.bottom &&
-      padRaw.top === padRaw.bottom
-    ) {
-      return { all: padRaw.left };
-    } else if (padRaw.left === padRaw.right && padRaw.top === padRaw.bottom) {
-      return {
-        horizontal: padRaw.left,
-        vertical: padRaw.top,
-      };
-    } else {
-      return {
-        left: padRaw.left,
-        right: padRaw.right,
-        top: padRaw.top,
-        bottom: padRaw.bottom,
-      };
+  if (padRaw.left == 0 && padRaw.right == 0 
+    && padRaw.top == 0 && padRaw.bottom == 0) {
+      return null;
     }
+
+  if (
+    padRaw.left === padRaw.right &&
+    padRaw.left === padRaw.bottom &&
+    padRaw.top === padRaw.bottom
+  ) {
+    return { all: padRaw.left };
+  } else if (padRaw.left === padRaw.right && padRaw.top === padRaw.bottom) {
+    return {
+      horizontal: padRaw.left,
+      vertical: padRaw.top,
+    };
   } else {
-    return null;
+    return {
+      left: padRaw.left,
+      right: padRaw.right,
+      top: padRaw.top,
+      bottom: padRaw.bottom,
+    };
   }
 };

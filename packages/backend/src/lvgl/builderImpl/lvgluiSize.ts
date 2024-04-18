@@ -27,9 +27,7 @@ function adjustPadding(length: number, node: SceneNode, hor: boolean) {
   let result = length;
   if ("paddingLeft" in node) {
     const padding = getRawPadding(node);
-    if (padding) {
-      result += hor ? padding.left + padding.right : padding.top + padding.bottom;
-    }
+    result += hor ? padding.left + padding.right : padding.top + padding.bottom;
   }
   return result;
 }
