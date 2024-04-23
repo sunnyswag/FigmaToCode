@@ -4,6 +4,7 @@ import { LvgluiDefaultBuilder, resetNodeIndex } from "./lvgluiDefaultBuilder";
 import { PluginSettings } from "../code";
 import { commonSortChildrenWhenInferredAutoLayout } from "../common/commonChildrenOrder";
 import { allStyleToString, clearCachedUIStyle } from "./builderImpl/style/styleUtils";
+import { LvgluiFlexBuilder } from "./lvgluiFlexBuilder";
 
 let localSettings: PluginSettings;
 
@@ -76,6 +77,7 @@ const lvgluiWidgetGenerator = (
 export const lvgluiContainer = (
   node: SceneNode,
   parentNodeName: string,
+  clazz?: { new (name: string): LvgluiDefaultBuilder }
 ): LvgluiDefaultBuilder | null => {
   // ignore the view when size is zero or less
   // while technically it shouldn't get less than 0, due to rounding errors,
@@ -84,10 +86,16 @@ export const lvgluiContainer = (
     return null;
   }
   
-  const result = new LvgluiDefaultBuilder(parentNodeName);
-  result.buildModifier(node, localSettings.optimizeLayout);
+  let instance: LvgluiDefaultBuilder
+  if (clazz === undefined) {
+    instance = new LvgluiDefaultBuilder(parentNodeName);
+  } else {
+    instance = new clazz(parentNodeName);
+  }
 
-  return result;
+  instance.buildModifier(node, localSettings.optimizeLayout);
+
+  return instance;
 };
 
 const lvgluiGroup = (
@@ -111,7 +119,8 @@ const lvgluiFrame = (
   node: SceneNode & BaseFrameMixin,
   parentNodeName: string
 ): string => {
-  const currentNode = lvgluiContainer(node, parentNodeName);  
+  const currentNode = lvgluiContainer(node, parentNodeName, 
+    node.inferredAutoLayout === null ? undefined : LvgluiFlexBuilder);
 
   const children = widgetGeneratorWithLimits(node, currentNode?.currentNodeName ?? parentNodeName);
   return (currentNode?.toString() ?? "") + children;

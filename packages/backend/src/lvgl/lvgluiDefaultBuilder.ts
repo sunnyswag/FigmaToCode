@@ -1,11 +1,6 @@
 import { lvgluiSize } from "./builderImpl/lvgluiSize";
-import {
-  lvgluiVisibility
-} from "./builderImpl/lvgluiBlend";
-import {
-  commonIsAbsolutePosition,
-  getCommonPositionValue
-} from "../common/commonPosition";
+import { lvgluiVisibility } from "./builderImpl/lvgluiBlend";
+import { commonIsAbsolutePosition, getCommonPositionValue } from "../common/commonPosition";
 import { Modifier, getStyleIndex, pushModifier } from "./builderImpl/style/styleUtils";
 import { LvglUIStyle } from "./builderImpl/style/lvgluiStyle";
 import { getRawPadding } from "../common/commonPadding";
@@ -53,8 +48,11 @@ export class LvgluiDefaultBuilder {
   }
 
   private position(node: SceneNode, optimizeLayout: boolean) {
+    if (!commonIsAbsolutePosition(node, optimizeLayout))
+      return;
+
     if (this.currentNodeName == "obj0") return;
-    
+  
     let paddingTop = 0;
     let paddingLeft = 0;
     if ("paddingLeft" in node) {
@@ -88,7 +86,7 @@ export class LvgluiDefaultBuilder {
       this.pushModifier(["add_style", `&style${styleIndex}, 0`])
   }
 
-  private pushModifier(...args: (Modifier | [string | null, string | null] | null)[]) {
+  protected pushModifier(...args: (Modifier | [string | null, string | null] | null)[]) {
     pushModifier(this.defPrefixModifiers, ...args);
   }
   
