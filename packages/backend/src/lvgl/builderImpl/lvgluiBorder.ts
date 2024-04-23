@@ -20,11 +20,14 @@ export const lvgluiBorder = (node: SceneNode): Modifier[] | null => {
   }
   
   return inset.strokeType.flatMap((type) => {
-    return [
-      [`${type}_width`, inset.width],
+    const width = Math.round(inset.width);
+    const result: Modifier[] = [
       [`${type}_color`, color.color],
       [`${type}_opa`, color.opacity]
     ]
+    if (width >= 0) 
+      result.push([`${type}_width`, width.toString()]);
+    return result;
   })
 };
 
