@@ -25,6 +25,6 @@ export class LvgluiTextBuilder extends LvgluiDefaultBuilder {
     } else if (textCase === "UPPER") {
         updatedText = node.characters.toUpperCase();
     }
-    this.pushSubModifier([`lv_label_set_text`, `"${updatedText}"`]);
+    this.pushCustomPrefixModifier([`lv_label_set_text`, `"${updatedText}"`]);
   }
 }

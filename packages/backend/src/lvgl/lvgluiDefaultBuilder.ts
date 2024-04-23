@@ -17,8 +17,8 @@ export class LvgluiDefaultBuilder {
   currentNodeName = `obj${nodeIndex}`;
   protected parentNodeName: string;
   protected readonly defPrefix = "lv_obj_"
-  private modifiers: Modifier[] = []
-  private subModifiers: Modifier[] = []
+  private defPrefixModifiers: Modifier[] = []
+  private customPrefixModifiers: Modifier[] = []
 
   constructor(parentNodeName: string = "lv_screen_active()") {
     this.parentNodeName = parentNodeName;
@@ -47,8 +47,8 @@ export class LvgluiDefaultBuilder {
 
     const result: string[] = [];
     result.push(this.createNodeStr());
-    result.push(...getModifiersStr(this.modifiers, this.defPrefix));
-    result.push(...getModifiersStr(this.subModifiers, ""));
+    result.push(...getModifiersStr(this.defPrefixModifiers, this.defPrefix));
+    result.push(...getModifiersStr(this.customPrefixModifiers, ""));
     return result.join("\n") + "\n\n";
   }
 
@@ -89,15 +89,15 @@ export class LvgluiDefaultBuilder {
   }
 
   private pushModifier(...args: (Modifier | [string | null, string | null] | null)[]) {
-    pushModifier(this.modifiers, ...args);
+    pushModifier(this.defPrefixModifiers, ...args);
   }
   
   protected constructStyle(node: SceneNode): LvglUIStyle {
     return LvglUIStyle.construct(node)
   }
 
-  protected pushSubModifier(...args: (Modifier | [string | null, string | null] | null)[]) {
-    pushModifier(this.subModifiers, ...args);
+  protected pushCustomPrefixModifier(...args: (Modifier | [string | null, string | null] | null)[]) {
+    pushModifier(this.customPrefixModifiers, ...args);
   }
 
   protected createNodeStr(): string {

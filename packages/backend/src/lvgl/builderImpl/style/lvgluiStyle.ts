@@ -11,7 +11,7 @@ import { IStyle } from "./iStyle";
 
 export class LvglUIStyle implements IStyle {
     prefix = "lv_style_set_";
-    readonly currentStyle: Modifier[] = [];
+    protected readonly currentStyle: Modifier[] = [];
 
     static construct(node: SceneNode): LvglUIStyle {
         const instance = new LvglUIStyle();
