@@ -1,16 +1,14 @@
-import { LVglUIFlexStyle } from "./builderImpl/style/lvgluiFlexStyle";
+import { LVglUIFlexStyle, getAutoNode } from "./builderImpl/style/lvgluiFlexStyle";
 import { LvgluiDefaultBuilder } from "./lvgluiDefaultBuilder";
 
 export class LvgluiFlexBuilder extends LvgluiDefaultBuilder {
 
   buildModifier(node: SceneNode, optimizeLayout: boolean): void {
       super.buildModifier(node, optimizeLayout);
-      if ("layoutMode" in node) {
-        const autoNode = node.inferredAutoLayout;
-        if (autoNode) {
-          this.setFlow(autoNode);
-          this.setFlexAlign(autoNode);
-        }
+      const autoNode = getAutoNode(node);
+      if (autoNode) {
+        this.setFlow(autoNode);
+        this.setFlexAlign(autoNode);
       }
   }
 

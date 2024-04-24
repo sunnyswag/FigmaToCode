@@ -6,11 +6,9 @@ export class LVglUIFlexStyle extends LvglUIStyle {
         const instance = new LVglUIFlexStyle();
 
         instance.constructCommonUIStyle(node);
-        if ("itemSpacing" in node) {
-            const autoNode = node.inferredAutoLayout;
-            if (autoNode) {
-                instance.flexPaddingRow(node);
-            }
+        const autoNode = getAutoNode(node);
+        if (autoNode) {
+            instance.flexPaddingRow(autoNode);
         }
 
         return instance;
@@ -21,4 +19,10 @@ export class LVglUIFlexStyle extends LvglUIStyle {
             "pad_row", Math.round(node.itemSpacing)
         ])
     }
+}
+
+export const getAutoNode = (node: SceneNode): InferredAutoLayoutResult | null => {
+    if ("itemSpacing" in node) {
+        return node.inferredAutoLayout;
+    } else return null
 }
