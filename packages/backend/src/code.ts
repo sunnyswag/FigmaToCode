@@ -25,6 +25,11 @@ export type PluginSettings = {
 };
 
 export const run = (settings: PluginSettings) => {
+  console.log("figma.currentPage.selection: ", figma.currentPage.selection);
+  console.log("figma.root.children: ", figma.root.children);
+  figma.root.children.forEach((item) => {
+    console.log("figma.children: ", item.children);
+  })
   // ignore when nothing was selected
   if (figma.currentPage.selection.length === 0) {
     figma.ui.postMessage({
