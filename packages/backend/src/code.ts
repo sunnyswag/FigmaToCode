@@ -30,6 +30,7 @@ export const run = (settings: PluginSettings) => {
   figma.root.children.forEach((item) => {
     console.log("figma.children: ", item.children);
   })
+  figma.saveVersionHistoryAsync("vtest");
   // ignore when nothing was selected
   if (figma.currentPage.selection.length === 0) {
     figma.ui.postMessage({
