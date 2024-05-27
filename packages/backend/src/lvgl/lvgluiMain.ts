@@ -49,6 +49,7 @@ const lvgluiWidgetGenerator = (
       case "RECTANGLE":
       case "ELLIPSE":
       case "LINE":
+      case "VECTOR":
         comp.push(lvgluiContainer(node, parentNodeName)?.toString() ?? "");
         break;
       case "GROUP":
